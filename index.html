@@ -411,6 +411,28 @@
       width: 60%; height: 60%; fill: currentColor;
     }
 
+
+    .market-summary-box {
+      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 8px;
+      line-height: 1.85;
+    }
+    .market-summary-box h2 {
+      font-size: 1.25rem; font-weight: 800; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .market-summary-box p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 12px; }
+    .market-summary-box p:last-child { margin-bottom: 0; }
+    .market-summary-box .highlight { color: var(--text); font-weight: 600; }
+    .data-na {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; font-weight: 600; color: var(--text-muted);
+      background: var(--bg-hover); border: 1px dashed var(--border);
+      padding: 4px 10px; border-radius: 999px;
+    }
   </style>
 </head>
 <body>
@@ -491,6 +513,34 @@
             <strong id="dt-clock">—</strong>
           </div>
         </div>
+        
+        <article class="market-summary-box" id="market-summary">
+          <h2>
+            <span class="lang-fa">خلاصه وضعیت فعلی بازار</span>
+            <span class="lang-en">Current Market Summary</span>
+          </h2>
+          <p class="lang-fa">
+            در <span class="highlight">فاینورس</span> می‌توانید قیمت لحظه‌ای <span class="highlight">طلا، سکه، نقره و ارزهای اصلی</span>
+            را بر اساس داده‌های زنده منبع TGJU مشاهده کنید. نرخ دلار، یورو، پوند، درهم، لیر، ریال سعودی و سایر ارزها
+            به‌همراه طلای ۱۸ و ۲۴ عیار و انواع سکه به‌صورت دوره‌ای به‌روزرسانی می‌شود.
+          </p>
+          <p class="lang-en">
+            On <span class="highlight">Finverse</span> you can track live prices for
+            <span class="highlight">gold, coins, silver and major currencies</span> powered by TGJU.
+            USD, EUR, GBP, AED, TRY, SAR and more are refreshed periodically along with 18K/24K gold and Iranian coins.
+          </p>
+          <p class="lang-fa">
+            نمودارهای طلا و دلار از <span class="highlight">تاریخچه واقعی روزانه</span> تغذیه می‌شوند.
+            بخش‌هایی مانند شاخص بورس تهران و بخشی از رمزارزها فعلاً به API زنده وصل نیستند و با برچسب
+            «داده موجود نیست» مشخص شده‌اند تا با قیمت‌های واقعی اشتباه گرفته نشوند.
+          </p>
+          <p class="lang-en">
+            Gold and USD charts use <span class="highlight">real daily history</span>.
+            Sections such as Tehran stock index and some cryptocurrencies are not live yet and are marked
+            «Data unavailable» so they are not confused with real quotes.
+          </p>
+        </article>
+
         <h2 class="section-title"><span class="lang-fa">وضعیت کلی بازار</span><span class="lang-en">Market Overview</span></h2>
         <p class="section-subtitle"><span class="lang-fa">خلاصه عملکرد بازارهای اصلی</span><span class="lang-en">Summary of major markets</span></p>
         <div class="status-grid">
@@ -551,7 +601,7 @@
           </div>
           <div class="price-card">
             <div class="price-card-header">
-              <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 8h5a2.5 2.5 0 0 1 0 5H9zm0 5h5.5a2.5 2.5 0 0 1 0 5H9zM10 6v2M13 6v2M10 16v2M13 16v2"/></svg></div><div><div class="asset-name"><span class="lang-fa">بیت‌کوین</span><span class="lang-en">Bitcoin</span></div><div class="asset-symbol">BTC</div></div></div>
+              <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 8h5a2.5 2.5 0 0 1 0 5H9zm0 5h5.5a2.5 2.5 0 0 1 0 5H9zM10 6v2M13 6v2M10 16v2M13 16v2"/></svg></div><div><div class="asset-name"><span class="lang-fa">بیت‌کوین</span><span class="lang-en">Bitcoin</span> <span class="data-na">داده موجود نیست</span></div><div class="asset-symbol">BTC</div></div></div>
               <button class="fav-btn active" onclick="event.stopPropagation()"><svg width="20" height="20" fill="currentColor" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
             </div>
             <div class="price-value">۶۴,۲۸۰</div>
@@ -578,7 +628,7 @@
           </div>
           <div class="price-card">
             <div class="price-card-header">
-              <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16l3-4 3 2 4-6"/></svg></div><div><div class="asset-name"><span class="lang-fa">شاخص کل بورس</span><span class="lang-en">TEDPIX</span></div><div class="asset-symbol">Index</div></div></div>
+              <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16l3-4 3 2 4-6"/></svg></div><div><div class="asset-name"><span class="lang-fa">شاخص کل بورس</span><span class="lang-en">TEDPIX</span> <span class="data-na">داده موجود نیست</span></div><div class="asset-symbol">Index</div></div></div>
               <button class="fav-btn active" onclick="event.stopPropagation()"><svg width="20" height="20" fill="currentColor" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
             </div>
             <div class="price-value">۲,۱۸۵,۴۲۰</div>
@@ -1292,6 +1342,12 @@
       { id: 'eur', nameFa: 'یورو', nameEn: 'Euro', symbol: 'EUR', category: 'forex', icon: '💶', price: '۷۴,۱۲۰', change: '+۰.۶۲٪', up: true, view: 'home' },
       { id: 'gbp', nameFa: 'پوند انگلیس', nameEn: 'British Pound', symbol: 'GBP', category: 'forex', icon: '💷', price: '۸۷,۴۰۰', change: '+۰.۴۱٪', up: true, view: 'home' },
       { id: 'aed', nameFa: 'درهم امارات', nameEn: 'UAE Dirham', symbol: 'AED', category: 'forex', icon: '💴', price: '۱۸,۶۶۰', change: '−۰.۲۹٪', up: false, view: 'home' },
+      { id: 'try', nameFa: 'لیر ترکیه', nameEn: 'Turkish Lira', symbol: 'TRY', category: 'forex', icon: '₺', price: '—', change: '—', up: true, view: 'home' },
+      { id: 'sar', nameFa: 'ریال سعودی', nameEn: 'Saudi Riyal', symbol: 'SAR', category: 'forex', icon: '﷼', price: '—', change: '—', up: true, view: 'home' },
+      { id: 'cad', nameFa: 'دلار کانادا', nameEn: 'Canadian Dollar', symbol: 'CAD', category: 'forex', icon: 'C$', price: '—', change: '—', up: true, view: 'home' },
+      { id: 'aud', nameFa: 'دلار استرالیا', nameEn: 'Australian Dollar', symbol: 'AUD', category: 'forex', icon: 'A$', price: '—', change: '—', up: true, view: 'home' },
+      { id: 'cny', nameFa: 'یوان چین', nameEn: 'Chinese Yuan', symbol: 'CNY', category: 'forex', icon: '¥', price: '—', change: '—', up: true, view: 'home' },
+      { id: 'mesghal', nameFa: 'مثقال طلا', nameEn: 'Mesghal Gold', symbol: 'MESGHAL', category: 'gold', icon: '🥇', price: '—', change: '—', up: true, view: 'asset' },
       { id: 'btc', nameFa: 'بیت‌کوین', nameEn: 'Bitcoin', symbol: 'BTC', category: 'crypto', icon: '₿', price: '۶۴,۲۸۰', change: '+۲.۱۵٪', up: true, view: 'home' },
       { id: 'eth', nameFa: 'اتریوم', nameEn: 'Ethereum', symbol: 'ETH', category: 'crypto', icon: 'Ξ', price: '۳,۴۲۰', change: '+۱.۸۷٪', up: true, view: 'home' },
       { id: 'sol', nameFa: 'سولانا', nameEn: 'Solana', symbol: 'SOL', category: 'crypto', icon: '◎', price: '۱۴۸.۶', change: '−۰.۹۲٪', up: false, view: 'home' },
@@ -1549,7 +1605,9 @@
       const w = parseFloat(document.getElementById('gold-weight').value) || 0;
       const t = document.getElementById('gold-type').value;
       const p = t === '24' ? PRICES.gold24 : t === '21' ? PRICES.gold21 : PRICES.gold18;
-      document.getElementById('gold-result-value').textContent = Math.round(w * p).toLocaleString('fa-IR') + ' تومان';
+      const total = Math.round(w * p);
+      const fmt = (window.MarketAPI && MarketAPI.formatToman) ? MarketAPI.formatToman(total) : total.toLocaleString('fa-IR');
+      document.getElementById('gold-result-value').textContent = fmt + ' تومان';
       document.getElementById('gold-result').classList.add('show');
     });
     document.getElementById('curr-calc-btn').addEventListener('click', () => {
@@ -1557,8 +1615,11 @@
       const from = document.getElementById('curr-from').value;
       const to = document.getElementById('curr-to').value;
       let result = from === to ? amount : from === 'IRR' ? amount / PRICES[to] : to === 'IRR' ? amount * PRICES[from] : (amount * PRICES[from]) / PRICES[to];
-      const unit = to === 'IRR' ? ' تومان' : ' ' + to;
-      document.getElementById('curr-result-value').textContent = (to === 'IRR' ? Math.round(result) : result.toFixed(2)).toLocaleString('fa-IR') + unit;
+      const fmtT = (window.MarketAPI && MarketAPI.formatToman) ? MarketAPI.formatToman : function(n){ return Math.round(n).toLocaleString('fa-IR'); };
+      let text;
+      if (to === 'IRR') text = fmtT(result) + ' تومان';
+      else text = Number(result).toLocaleString('fa-IR', { maximumFractionDigits: 4 }) + ' ' + to;
+      document.getElementById('curr-result-value').textContent = text;
       document.getElementById('curr-result').classList.add('show');
     });
     document.getElementById('pl-calc-btn').addEventListener('click', () => {
@@ -1568,7 +1629,10 @@
       const diff = (sell - buy) * qty;
       const pct = buy ? ((sell - buy) / buy * 100) : 0;
       const el = document.getElementById('pl-result-value');
-      el.textContent = (diff >= 0 ? '+' : '') + Math.round(diff).toLocaleString('fa-IR') + ' (' + (diff >= 0 ? '+' : '') + pct.toFixed(2) + '٪)';
+      const fmtT = (window.MarketAPI && MarketAPI.formatToman) ? MarketAPI.formatToman : function(n){ return Math.round(n).toLocaleString('fa-IR'); };
+      el.textContent = (diff >= 0 ? '+' : '') + fmtT(Math.abs(diff)) + (diff < 0 ? '−' : '') + ' تومان (' + (diff >= 0 ? '+' : '') + pct.toFixed(2) + '٪)';
+      if (diff < 0) el.textContent = '−' + fmtT(Math.abs(diff)) + ' تومان (' + pct.toFixed(2) + '٪)';
+      else el.textContent = '+' + fmtT(diff) + ' تومان (+' + pct.toFixed(2) + '٪)';
       el.className = 'tool-result-value ' + (diff >= 0 ? 'up' : 'down');
       document.getElementById('pl-result').classList.add('show');
     });
@@ -1653,6 +1717,12 @@
         else if (name.includes('بهار') || name.includes('Bahar')) item = items.bahar;
         else if (name.includes('نیم') || name.includes('Half')) item = items.half;
         else if (name.includes('تتر') || name.includes('Tether')) item = items.usdt;
+        else if (name.includes('لیر') || name.includes('TRY')) item = items['try'];
+        else if (name.includes('سعودی') || name.includes('SAR')) item = items.sar;
+        else if (name.includes('کانادا') || name.includes('CAD')) item = items.cad;
+        else if (name.includes('استرالیا') || name.includes('AUD')) item = items.aud;
+        else if (name.includes('یوان') || name.includes('CNY')) item = items.cny;
+        else if (name.includes('مثقال') || name.includes('Mesghal')) item = items.mesghal;
 
         if (!item) return;
         priceEl.textContent = item.priceFormatted;
@@ -1724,9 +1794,52 @@
       }
     }
 
-    // Initial load + poll every 90s
+    /** Load real daily history into sparklines / main chart */
+    async function refreshChartsFromHistory() {
+      if (!window.MarketAPI || !MarketAPI.fetchHistory) return;
+      try {
+        const [usdH, goldH, emamiH] = await Promise.all([
+          MarketAPI.fetchHistory('usd', 30),
+          MarketAPI.fetchHistory('gold18', 30),
+          MarketAPI.fetchHistory('emami', 30)
+        ]);
+        // Homepage / gold page mini charts if present
+        if (usdH.length > 2 && typeof drawSparkline === 'function') {
+          const isUp = usdH[usdH.length - 1] >= usdH[0];
+          const el = document.getElementById('chart-usd') || document.getElementById('chart-g18');
+        }
+        if (goldH.length > 2) {
+          if (document.getElementById('chart-g18')) drawSparkline('chart-g18', goldH, goldH[goldH.length-1] >= goldH[0]);
+          if (document.getElementById('chart-gold')) drawSparkline('chart-gold', goldH, goldH[goldH.length-1] >= goldH[0]);
+          if (document.getElementById('main-chart') && typeof drawMainChart === 'function') {
+            // expose for range buttons
+            window.__histGold = { '1d': goldH.slice(-7), '1w': goldH.slice(-14), '1m': goldH, '1y': goldH };
+            drawMainChart(goldH.slice(-14));
+          }
+        }
+        if (emamiH.length > 2 && document.getElementById('chart-emami')) {
+          drawSparkline('chart-emami', emamiH, emamiH[emamiH.length-1] >= emamiH[0]);
+        }
+        if (usdH.length > 2) {
+          if (document.getElementById('chart-usd')) drawSparkline('chart-usd', usdH, usdH[usdH.length-1] >= usdH[0]);
+          if (document.getElementById('chart-sil') && MarketAPI.fetchHistory) {
+            MarketAPI.fetchHistory('silver', 30).then(function(sh) {
+              if (sh.length > 2) drawSparkline('chart-sil', sh, sh[sh.length-1] >= sh[0]);
+            });
+          }
+        }
+        console.info('[MarketAPI] charts history loaded');
+      } catch (e) {
+        console.warn('[MarketAPI] chart history failed', e);
+      }
+    }
+
+    // Initial load + poll every 90s (pause when tab hidden)
     refreshLivePrices(true);
-    setInterval(() => refreshLivePrices(false), 90_000);
+    refreshChartsFromHistory();
+    setInterval(function () {
+      if (!document.hidden) refreshLivePrices(false);
+    }, 90000);
   </script>
 </body>
 </html>
