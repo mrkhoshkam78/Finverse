@@ -1,203 +1,174 @@
 /**
- * Live Market Price API Layer
- * Source: TGJU (call5.tgju.org) — free, CORS-enabled
- * Clean, modular, no external dependencies
+ * Finverse Market API Layer
+ * Primary source: TGJU (call5.tgju.org) — free, CORS *
+ * Covers: forex, gold, silver, coins, global metals
  */
+(function (global) {
+  'use strict';
 
-const TGJU_URL = 'https://call5.tgju.org/ajax.json';
-const CACHE_TTL_MS = 60_000; // 1 minute client cache
+  var TGJU_URL = 'https://call5.tgju.org/ajax.json';
+  var CACHE_TTL_MS = 60000;
+  var cache = { data: null, fetchedAt: 0 };
 
-/** @type {{ data: object|null, fetchedAt: number }} */
-let _cache = { data: null, fetchedAt: 0 };
-
-/** TGJU key → internal asset id */
-const KEY_MAP = {
-  price_dollar_rl: 'usd',
-  price_eur: 'eur',
-  price_gbp: 'gbp',
-  price_aed: 'aed',
-  geram18: 'gold18',
-  geram24: 'gold24',
-  sekee: 'emami',
-  sekeb: 'bahar',
-  nim: 'half',
-  rob: 'quarter',
-  silver_999: 'silver',
-  ons: 'ounce',
-  'usdt-irr': 'usdt',
-};
-
-/**
- * Parse TGJU price string → number (Rial)
- * @param {string|number} value
- * @returns {number}
- */
-function parsePrice(value) {
-  if (value == null) return 0;
-  const n = Number(String(value).replace(/,/g, '').trim());
-  return Number.isFinite(n) ? n : 0;
-}
-
-/**
- * Rial → Toman (display unit used on site)
- * @param {number} rial
- * @returns {number}
- */
-function toToman(rial) {
-  return Math.round(rial / 10);
-}
-
-/**
- * Format number with Persian locale separators
- * @param {number} n
- * @returns {string}
- */
-function formatNumber(n) {
-  return Math.round(n).toLocaleString('fa-IR');
-}
-
-/**
- * Fetch raw TGJU payload (with short client cache)
- * @param {boolean} [force=false]
- * @returns {Promise<object>}
- */
-async function fetchTgju(force = false) {
-  const now = Date.now();
-  if (!force && _cache.data && now - _cache.fetchedAt < CACHE_TTL_MS) {
-    return _cache.data;
-  }
-
-  const res = await fetch(TGJU_URL, {
-    method: 'GET',
-    headers: { Accept: 'application/json' },
-    cache: 'no-store',
-  });
-
-  if (!res.ok) {
-    throw new Error(`TGJU HTTP ${res.status}`);
-  }
-
-  const json = await res.json();
-  if (!json || !json.current) {
-    throw new Error('TGJU: invalid payload');
-  }
-
-  _cache = { data: json, fetchedAt: now };
-  return json;
-}
-
-/**
- * Normalize one TGJU item into UI-friendly shape
- * @param {string} id
- * @param {object} raw
- * @param {{ unit?: string, isUsd?: boolean }} [opts]
- */
-function normalizeItem(id, raw, opts = {}) {
-  const priceRial = parsePrice(raw.p);
-  const highRial = parsePrice(raw.h);
-  const lowRial = parsePrice(raw.l);
-  const changeVal = parsePrice(raw.d);
-  const changePct = Number(raw.dp) || 0;
-  const isUsd = Boolean(opts.isUsd);
-  const price = isUsd ? priceRial : toToman(priceRial);
-
-  return {
-    id,
-    price,
-    priceRaw: priceRial,
-    priceFormatted: isUsd
-      ? priceRial.toLocaleString('en-US', { maximumFractionDigits: 2 })
-      : formatNumber(price),
-    high: isUsd ? highRial : toToman(highRial),
-    low: isUsd ? lowRial : toToman(lowRial),
-    changeValue: isUsd ? changeVal : toToman(changeVal),
-    changePercent: changePct,
-    changeFormatted: `${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}٪`,
-    isUp: changePct > 0 || (changePct === 0 && changeVal >= 0),
-    time: raw.t || raw['t-g'] || '',
-    timeEn: raw.t_en || '',
-    unit: opts.unit || 'تومان',
-    source: 'TGJU',
+  var KEY_MAP = {
+    price_dollar_rl: 'usd',
+    price_eur: 'eur',
+    price_gbp: 'gbp',
+    price_aed: 'aed',
+    'usdt-irr': 'usdt',
+    geram18: 'gold18',
+    geram24: 'gold24',
+    sekee: 'emami',
+    sekeb: 'bahar',
+    nim: 'half',
+    rob: 'quarter',
+    silver_999: 'silver',
+    ons: 'ounce',
+    copper: 'copper',
+    base_global_zinc: 'zinc'
   };
-}
 
-/**
- * Build structured market snapshot from TGJU current object
- * @param {object} current
- */
-function buildSnapshot(current) {
-  const get = (key) => current[key] || null;
+  function parsePrice(value) {
+    if (value == null || value === '') return 0;
+    var n = Number(String(value).replace(/,/g, '').trim());
+    return Number.isFinite(n) ? n : 0;
+  }
 
-  const usd = get('price_dollar_rl');
-  const eur = get('price_eur');
-  const gbp = get('price_gbp');
-  const aed = get('price_aed');
-  const gold18 = get('geram18');
-  const gold24 = get('geram24');
-  const emami = get('sekee');
-  const bahar = get('sekeb');
-  const half = get('nim');
-  const quarter = get('rob');
-  const silver = get('silver_999');
-  const ounce = get('ons');
-  const usdt = get('usdt-irr');
+  function toToman(rial) {
+    return Math.round(rial / 10);
+  }
 
-  const items = {};
+  function formatFa(n, digits) {
+    digits = digits || 0;
+    return Number(n).toLocaleString('fa-IR', {
+      maximumFractionDigits: digits,
+      minimumFractionDigits: digits
+    });
+  }
 
-  if (usd) items.usd = normalizeItem('usd', usd, { unit: 'تومان' });
-  if (eur) items.eur = normalizeItem('eur', eur, { unit: 'تومان' });
-  if (gbp) items.gbp = normalizeItem('gbp', gbp, { unit: 'تومان' });
-  if (aed) items.aed = normalizeItem('aed', aed, { unit: 'تومان' });
-  if (gold18) items.gold18 = normalizeItem('gold18', gold18, { unit: 'تومان / گرم' });
-  if (gold24) items.gold24 = normalizeItem('gold24', gold24, { unit: 'تومان / گرم' });
-  if (emami) items.emami = normalizeItem('emami', emami, { unit: 'تومان' });
-  if (bahar) items.bahar = normalizeItem('bahar', bahar, { unit: 'تومان' });
-  if (half) items.half = normalizeItem('half', half, { unit: 'تومان' });
-  if (quarter) items.quarter = normalizeItem('quarter', quarter, { unit: 'تومان' });
-  if (silver) items.silver = normalizeItem('silver', silver, { unit: 'تومان / گرم' });
-  if (ounce) items.ounce = normalizeItem('ounce', ounce, { unit: 'USD', isUsd: true });
-  if (usdt) items.usdt = normalizeItem('usdt', usdt, { unit: 'تومان' });
+  function formatEn(n, digits) {
+    digits = digits == null ? 0 : digits;
+    return Number(n).toLocaleString('en-US', {
+      maximumFractionDigits: digits,
+      minimumFractionDigits: digits
+    });
+  }
 
-  return {
-    items,
-    updatedAt: new Date().toISOString(),
-    source: 'TGJU',
+  function fetchTgju(force) {
+    var now = Date.now();
+    if (!force && cache.data && now - cache.fetchedAt < CACHE_TTL_MS) {
+      return Promise.resolve(cache.data);
+    }
+    return fetch(TGJU_URL, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      cache: 'no-store'
+    }).then(function (res) {
+      if (!res.ok) throw new Error('TGJU HTTP ' + res.status);
+      return res.json();
+    }).then(function (json) {
+      if (!json || typeof json.current !== 'object') {
+        throw new Error('TGJU: invalid payload');
+      }
+      cache = { data: json, fetchedAt: Date.now() };
+      return json;
+    });
+  }
+
+  function normalizeItem(id, raw, opts) {
+    opts = opts || {};
+    var currency = opts.currency || 'IRT';
+    var digits = opts.digits != null ? opts.digits : 0;
+    var priceRaw = parsePrice(raw.p);
+    var highRaw = parsePrice(raw.h);
+    var lowRaw = parsePrice(raw.l);
+    var changeRaw = parsePrice(raw.d);
+    var changePct = Number(raw.dp) || 0;
+    var isUsd = currency === 'USD';
+    var price = isUsd ? priceRaw : toToman(priceRaw);
+    var high = isUsd ? highRaw : toToman(highRaw);
+    var low = isUsd ? lowRaw : toToman(lowRaw);
+    var changeValue = isUsd ? changeRaw : toToman(changeRaw);
+
+    return {
+      id: id,
+      price: price,
+      priceRaw: priceRaw,
+      priceFormatted: isUsd ? formatEn(price, digits || 2) : formatFa(price, digits),
+      high: high,
+      low: low,
+      changeValue: changeValue,
+      changePercent: changePct,
+      changeFormatted: (changePct >= 0 ? '+' : '') + changePct.toFixed(2) + '%',
+      isUp: changePct > 0 || (changePct === 0 && changeValue >= 0),
+      time: raw.t || raw['t-g'] || '',
+      timeEn: raw.t_en || '',
+      unit: opts.unit || (isUsd ? 'USD' : 'تومان'),
+      currency: currency,
+      source: 'TGJU'
+    };
+  }
+
+  function pick(current, key) {
+    return current[key] || null;
+  }
+
+  function buildSnapshot(current) {
+    var items = {};
+    function add(key, id, opts) {
+      var raw = pick(current, key);
+      if (raw) items[id] = normalizeItem(id, raw, opts);
+    }
+
+    add('price_dollar_rl', 'usd', { unit: 'تومان' });
+    add('price_eur', 'eur', { unit: 'تومان' });
+    add('price_gbp', 'gbp', { unit: 'تومان' });
+    add('price_aed', 'aed', { unit: 'تومان' });
+    add('usdt-irr', 'usdt', { unit: 'تومان' });
+
+    add('geram18', 'gold18', { unit: 'تومان / گرم' });
+    add('geram24', 'gold24', { unit: 'تومان / گرم' });
+    add('sekee', 'emami', { unit: 'تومان' });
+    add('sekeb', 'bahar', { unit: 'تومان' });
+    add('nim', 'half', { unit: 'تومان' });
+    add('rob', 'quarter', { unit: 'تومان' });
+    add('silver_999', 'silver', { unit: 'تومان / گرم' });
+
+    add('ons', 'ounce', { unit: 'USD', currency: 'USD', digits: 2 });
+    add('copper', 'copper', { unit: 'USD / ton', currency: 'USD', digits: 2 });
+    add('base_global_zinc', 'zinc', { unit: 'USD / ton', currency: 'USD', digits: 2 });
+
+    return {
+      items: items,
+      updatedAt: new Date().toISOString(),
+      source: 'TGJU'
+    };
+  }
+
+  function loadMarketData(options) {
+    options = options || {};
+    return fetchTgju(Boolean(options.force)).then(function (json) {
+      return buildSnapshot(json.current);
+    });
+  }
+
+  function getAsset(id, options) {
+    return loadMarketData(options || {}).then(function (snap) {
+      return snap.items[id] || null;
+    });
+  }
+
+  function clearCache() {
+    cache = { data: null, fetchedAt: 0 };
+  }
+
+  global.MarketAPI = {
+    loadMarketData: loadMarketData,
+    getAsset: getAsset,
+    clearCache: clearCache,
+    KEY_MAP: KEY_MAP,
+    formatFa: formatFa,
+    formatEn: formatEn,
+    toToman: toToman
   };
-}
-
-/**
- * Public API: load live market data
- * @param {{ force?: boolean }} [options]
- * @returns {Promise<{ items: Record<string, object>, updatedAt: string, source: string }>}
- */
-async function loadMarketData(options = {}) {
-  const json = await fetchTgju(Boolean(options.force));
-  return buildSnapshot(json.current);
-}
-
-/**
- * Get single asset by internal id
- * @param {string} id
- * @param {{ force?: boolean }} [options]
- */
-async function getAsset(id, options = {}) {
-  const snap = await loadMarketData(options);
-  return snap.items[id] || null;
-}
-
-/**
- * Clear client cache (force next fetch)
- */
-function clearCache() {
-  _cache = { data: null, fetchedAt: 0 };
-}
-
-// Global API surface (classic script — no bundler required)
-window.MarketAPI = {
-  loadMarketData,
-  getAsset,
-  clearCache,
-  KEY_MAP,
-  formatNumber,
-  toToman,
-};
+})(typeof window !== 'undefined' ? window : globalThis);
