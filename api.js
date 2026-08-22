@@ -266,18 +266,30 @@
     var changeRaw = parsePrice(raw.d);
     var changePct = raw.dp != null ? Number(raw.dp) : null;
     var isUsd = currency === 'USD';
-    var price = priceRaw == null ? null : (isUsd ? priceRaw : toToman(priceRaw));
+    var isIndex = currency === 'INDEX';
+    var scale = function (v) {
+      if (v == null) return null;
+      if (isUsd || isIndex) return v;
+      return toToman(v);
+    };
+    var price = scale(priceRaw);
+    var fmt = function (v) {
+      if (v == null) return null;
+      if (isIndex) return formatFa(v, 1);
+      if (isUsd) return formatFa(v, 2);
+      return formatToman(v);
+    };
     return {
       id: id,
       price: price,
-      priceFormatted: price == null ? null : (isUsd ? formatFa(price, 2) : formatToman(price)),
-      high: highRaw == null ? null : (isUsd ? highRaw : toToman(highRaw)),
-      low: lowRaw == null ? null : (isUsd ? lowRaw : toToman(lowRaw)),
-      changeValue: changeRaw == null ? null : (isUsd ? changeRaw : toToman(changeRaw)),
+      priceFormatted: fmt(price),
+      high: scale(highRaw),
+      low: scale(lowRaw),
+      changeValue: scale(changeRaw),
       changePercent: changePct,
       changeFormatted: changePct != null ? ((changePct >= 0 ? '+' : '') + changePct.toFixed(2) + '%') : null,
       isUp: changePct != null ? changePct >= 0 : null,
-      unit: opts.unit || 'تومان',
+      unit: opts.unit || (isIndex ? 'واحد' : 'تومان'),
       source: 'TGJU',
       available: price != null
     };
@@ -305,6 +317,7 @@
     add('ons', 'ounce', { unit: 'USD', currency: 'USD' });
     add('copper', 'copper', { unit: 'USD / ton', currency: 'USD' });
     add('base_global_zinc', 'zinc', { unit: 'USD / ton', currency: 'USD' });
+    add('bourse', 'tedpix', { unit: 'واحد', currency: 'INDEX' });
     add('crypto-bitcoin-irr', 'btc', { unit: 'تومان' });
     add('crypto-ethereum-irr', 'eth', { unit: 'تومان' });
     add('crypto-solana-irr', 'sol', { unit: 'تومان' });
@@ -397,7 +410,7 @@
     var ID_MAP = {
       usd: 'price_dollar_rl', eur: 'price_eur', gbp: 'price_gbp',
       aed: 'price_aed', try: 'price_try', sar: 'price_sar',
-      gold18: 'geram18', gold24: 'geram24', emami: 'sekee', silver: 'silver_999', ounce: 'ons', btc: 'crypto-bitcoin-irr', eth: 'crypto-ethereum-irr'
+      gold18: 'geram18', gold24: 'geram24', emami: 'sekee', silver: 'silver_999', ounce: 'ons', btc: 'crypto-bitcoin-irr', eth: 'crypto-ethereum-irr', tedpix: 'bourse', bourse: 'bourse'
     };
     if (ID_MAP[key]) key = ID_MAP[key];
     if (!key) return Promise.resolve([]);
