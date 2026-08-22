@@ -959,7 +959,20 @@
   </div>
 
   <!-- ==================== VIEW: ASSET DETAIL ==================== -->
-  <div id="view-asset" class="view">
+  <div 
+        <h2 class="section-title" style="margin-top:40px">
+          <span class="lang-fa">فلزات و کالاهای مرتبط</span>
+          <span class="lang-en">Metals & Related</span>
+        </h2>
+        <p class="section-desc">
+          <span class="lang-fa">انس طلا، نقره، مس و روی — داده مستقیم از API</span>
+          <span class="lang-en">Gold ounce, silver, copper, zinc — live from API</span>
+        </p>
+        <div class="market-grid" id="metals-live-grid">
+          <div class="price-card"><div class="price-value na-text">در حال بارگذاری…</div></div>
+        </div>
+
+  id="view-asset" class="view">
     <div class="asset-hero">
       <div class="container">
         <nav class="breadcrumb">
@@ -1275,7 +1288,7 @@
     </div>
   </footer>
 
-  <script src="api.js"></script>
+  <script src="api.js" onerror="console.error('api.js failed to load — place api.js next to this HTML file')"></script>
   <script>
     const html = document.documentElement;
 
@@ -1313,13 +1326,25 @@
       const el = document.getElementById('view-' + name);
       if (el) el.classList.add('active');
       document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
-      if (name === 'gold' || name === 'asset') document.querySelectorAll('.nav-gold').forEach(a => a.classList.add('active'));
+      if (name === 'gold' || name === 'asset') {
+        document.querySelectorAll('.nav-gold').forEach(a => a.classList.add('active'));
+      }
+      if (name === 'forex') {
+        document.querySelectorAll('.nav-forex').forEach(a => a.classList.add('active'));
+      }
       window.scrollTo(0, 0);
-      // Redraw charts when switching views
-      setTimeout(() => {
-        if (name === 'gold') { renderMiniCharts(); }
-        if (name === 'asset') { drawMainChart(mainRanges['1w']); }
-      }, 50);
+      setTimeout(function () {
+        if (name === 'gold') {
+          if (typeof renderMiniCharts === 'function') renderMiniCharts();
+          if (typeof refreshChartsFromHistory === 'function') refreshChartsFromHistory();
+        }
+        if (name === 'asset' && typeof drawMainChart === 'function') {
+          drawMainChart(mainRanges['1w'] || []);
+        }
+        if (name === 'forex' && typeof loadForexPage === 'function') {
+          loadForexPage(false);
+        }
+      }, 80);
     }
 
     document.querySelectorAll('[data-view]').forEach(el => {
@@ -1999,28 +2024,41 @@
       var st = document.getElementById('fx-api-status');
       var cnt = document.getElementById('fx-count');
       var upd = document.getElementById('fx-updated');
-      if (!window.MarketAPI || !MarketAPI.loadCurrencies) {
-        st.textContent = 'API در دسترس نیست';
+      var tbody = document.getElementById('fx-tbody');
+      if (!st) return;
+      if (!window.MarketAPI || typeof MarketAPI.loadCurrencies !== 'function') {
+        st.textContent = 'API در دسترس نیست — api.js را بررسی کنید';
         st.className = 'err';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="na-text">فایل api.js لود نشده است</td></tr>';
         return;
       }
-      st.textContent = '…';
+      st.textContent = 'در حال اتصال…';
       st.className = '';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="na-text">در حال بارگذاری از API…</td></tr>';
       MarketAPI.loadCurrencies({ force: !!force }).then(function (res) {
         __fxList = res.currencies || [];
-        if (res.status === 'ok') {
+        console.info('[Forex] loaded', res.count, res.status, res.error);
+        if (res.status === 'ok' && __fxList.length) {
           st.textContent = 'متصل';
           st.className = 'ok';
+        } else if (res.status === 'ok') {
+          st.textContent = 'متصل — لیست خالی';
+          st.className = 'err';
         } else {
           st.textContent = 'خطا: ' + (res.error || 'نامشخص');
           st.className = 'err';
         }
-        cnt.textContent = res.count != null ? String(res.count) : '—';
-        upd.textContent = res.updatedAt
+        if (cnt) cnt.textContent = res.count != null ? String(res.count) : '—';
+        if (upd) upd.textContent = res.updatedAt
           ? new Date(res.updatedAt).toLocaleString('fa-IR')
           : '—';
         renderFxTable();
         fillConvSelects();
+      }).catch(function (err) {
+        console.error('[Forex]', err);
+        st.textContent = 'خطا: ' + err;
+        st.className = 'err';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="na-text">خطا در دریافت داده</td></tr>';
       });
     }
 
@@ -2061,16 +2099,6 @@
         });
       });
     })();
-
-    // Hook showView to load forex data
-    var _origShowView = showView;
-    showView = function (name) {
-      _origShowView(name);
-      if (name === 'forex') loadForexPage(false);
-      document.querySelectorAll('.nav-forex').forEach(function (a) {
-        a.classList.toggle('active', name === 'forex');
-      });
-    };
 
     // ===== Live Prices (TGJU via api.js) =====
     /** Map internal id → selectors / update helpers on homepage cards */
@@ -2174,15 +2202,90 @@
             gold18: items.gold18, gold24: items.gold24, emami: items.emami,
             bahar: items.bahar, half: items.half, silver: items.silver,
             usd: items.usd, eur: items.eur, gbp: items.gbp, aed: items.aed, usdt: items.usdt,
+            mesghal: items.mesghal,
           };
           const live = map[a.id];
-          if (live) {
+          if (live && live.priceFormatted) {
             a.price = live.priceFormatted;
             a.change = live.changeFormatted;
             a.up = live.isUp;
           }
         });
       }
+
+      // Gold page table rows by symbol text
+      document.querySelectorAll('#view-gold table tbody tr').forEach(function (tr) {
+        var cells = tr.querySelectorAll('td');
+        if (cells.length < 3) return;
+        var label = (cells[0].textContent || '').trim();
+        var item = null;
+        if (label.indexOf('۱۸') !== -1 || label.indexOf('18') !== -1) item = items.gold18;
+        else if (label.indexOf('۲۴') !== -1 || label.indexOf('24') !== -1) item = items.gold24;
+        else if (label.indexOf('امامی') !== -1 || label.indexOf('Emami') !== -1) item = items.emami;
+        else if (label.indexOf('بهار') !== -1 || label.indexOf('Bahar') !== -1) item = items.bahar;
+        else if (label.indexOf('نیم') !== -1 || label.indexOf('Half') !== -1) item = items.half;
+        else if (label.indexOf('ربع') !== -1 || label.indexOf('Quarter') !== -1) item = items.quarter;
+        else if (label.indexOf('مثقال') !== -1) item = items.mesghal;
+        else if (label.indexOf('نقره') !== -1 || label.indexOf('Silver') !== -1) item = items.silver;
+        else if (label.indexOf('انس') !== -1 || label.indexOf('Ounce') !== -1) item = items.ounce;
+        if (!item || !item.priceFormatted) {
+          if (cells[1]) cells[1].textContent = 'داده موجود نیست';
+          return;
+        }
+        if (cells[1]) cells[1].textContent = item.priceFormatted;
+        if (cells[2] && item.changeFormatted) {
+          cells[2].textContent = item.changeFormatted;
+          cells[2].classList.toggle('up', !!item.isUp);
+          cells[2].classList.toggle('down', !item.isUp);
+        }
+      });
+
+
+      // Metals grid on gold page
+      var metalsGrid = document.getElementById('metals-live-grid');
+      if (metalsGrid) {
+        var metalDefs = [
+          { id: 'ounce', nameFa: 'انس طلا', nameEn: 'Gold Ounce' },
+          { id: 'silver', nameFa: 'نقره ۹۹۹', nameEn: 'Silver 999' },
+          { id: 'copper', nameFa: 'مس', nameEn: 'Copper' },
+          { id: 'zinc', nameFa: 'روی', nameEn: 'Zinc' },
+          { id: 'mesghal', nameFa: 'مثقال طلا', nameEn: 'Mesghal' },
+          { id: 'gold18', nameFa: 'طلای ۱۸ عیار', nameEn: '18K Gold' },
+          { id: 'gold24', nameFa: 'طلای ۲۴ عیار', nameEn: '24K Gold' },
+          { id: 'emami', nameFa: 'سکه امامی', nameEn: 'Emami Coin' }
+        ];
+        var lang = html.getAttribute('data-lang') || 'fa';
+        metalsGrid.innerHTML = metalDefs.map(function (d) {
+          var it = items[d.id];
+          var name = lang === 'fa' ? d.nameFa : d.nameEn;
+          if (!it || !it.priceFormatted) {
+            return '<div class="price-card"><div class="asset-name">' + name + '</div><div class="price-value na-text">داده موجود نیست</div></div>';
+          }
+          var ch = it.changeFormatted || '';
+          var cls = it.isUp ? 'up' : 'down';
+          return '<div class="price-card"><div class="asset-name">' + name + '</div>' +
+            '<div class="price-value">' + it.priceFormatted + (it.unit ? ' <small style="font-size:0.7em;color:var(--text-muted)">' + it.unit + '</small>' : '') + '</div>' +
+            '<div class="price-change ' + cls + '">' + (ch || '—') + '</div></div>';
+        }).join('');
+      }
+
+      // Mark non-live homepage cards (stock / crypto samples)
+      document.querySelectorAll('.price-card').forEach(function (card) {
+        var nameEl = card.querySelector('.asset-name');
+        if (!nameEl) return;
+        var n = nameEl.textContent || '';
+        if (n.indexOf('بورس') !== -1 || n.indexOf('TEDPIX') !== -1 ||
+            n.indexOf('بیت') !== -1 || n.indexOf('Bitcoin') !== -1 ||
+            n.indexOf('اتریوم') !== -1 || n.indexOf('Ethereum') !== -1) {
+          var pv = card.querySelector('.price-value');
+          if (pv && !nameEl.querySelector('.data-na')) {
+            // keep NA badge if present; replace mock price
+            if (pv.textContent.indexOf('داده') === -1) {
+              pv.textContent = 'داده موجود نیست';
+            }
+          }
+        }
+      });
     }
 
     async function refreshLivePrices(force = false) {
@@ -2241,10 +2344,18 @@
 
     // Initial load + poll every 90s (pause when tab hidden)
     refreshLivePrices(true);
-    refreshChartsFromHistory();
+    if (typeof refreshChartsFromHistory === 'function') refreshChartsFromHistory();
     setInterval(function () {
       if (!document.hidden) refreshLivePrices(false);
     }, 90000);
+
+    // Deep-link: #forex / #gold
+    (function () {
+      var hash = (location.hash || '').replace('#', '');
+      if (hash === 'forex' || hash === 'gold' || hash === 'asset' || hash === 'search') {
+        showView(hash);
+      }
+    })();
   </script>
 </body>
 </html>
