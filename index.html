@@ -640,6 +640,70 @@
       color: var(--text-secondary); cursor: pointer; display: grid; place-items: center;
     }
     .auth-modal-wrap { position: relative; }
+
+    /* User Panel */
+    .panel-hero {
+      padding: 32px 0 24px; border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%);
+    }
+    .panel-hero h1 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 800; margin-bottom: 6px; }
+    .panel-hero .panel-sub { color: var(--text-secondary); font-size: 0.95rem; }
+    .panel-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 24px 0;
+    }
+    .panel-stat {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 18px 16px;
+    }
+    .panel-stat .label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+    .panel-stat .value { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+    .panel-stat .value.up { color: var(--up); }
+    .panel-stat .value.down { color: var(--down); }
+    .panel-section-title {
+      font-size: 1.15rem; font-weight: 800; margin: 28px 0 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .watch-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;
+    }
+    .watch-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 18px; cursor: pointer; transition: all var(--transition); position: relative;
+    }
+    .watch-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .watch-card .rm {
+      position: absolute; top: 10px; inset-inline-end: 10px;
+      width: 28px; height: 28px; border-radius: 8px; border: none; background: var(--bg-hover);
+      color: var(--text-muted); cursor: pointer; font-size: 0.9rem;
+    }
+    .watch-card .rm:hover { color: var(--down); }
+    .trade-form {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; align-items: end;
+    }
+    .trade-form label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 6px; }
+    .trade-form input, .trade-form select {
+      width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text);
+    }
+    .trade-form button {
+      background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm);
+      padding: 11px 16px; font-weight: 700; cursor: pointer;
+    }
+    .trades-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-card); }
+    .trades-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+    .trades-table th, .trades-table td { padding: 12px 14px; text-align: right; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    .trades-table th { background: var(--bg-elevated); color: var(--text-muted); font-size: 0.78rem; }
+    .panel-empty {
+      text-align: center; padding: 36px 16px; color: var(--text-muted);
+      border: 1px dashed var(--border); border-radius: var(--radius-lg); background: var(--bg-card);
+    }
+    @media (max-width: 900px) {
+      .panel-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .panel-stats { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -675,11 +739,11 @@
             </svg>
           </button>
           <div class="user-menu-dropdown" id="user-menu-dropdown" role="menu">
-            <div class="user-email" id="user-menu-email" hidden>—</div>
-            <div class="user-panel-label" id="user-panel-label" hidden>
+            <button type="button" class="user-panel-label" id="user-panel-label" hidden role="menuitem" style="width:100%;text-align:start;cursor:pointer;background:transparent;border:none">
               <span class="lang-fa">پنل</span><span class="lang-en">Panel</span>:
               <strong id="user-display-name">—</strong>
-            </div>
+            </button>
+            <div class="user-email" id="user-menu-email" hidden>—</div>
             <button type="button" id="btn-open-login" role="menuitem"><span class="lang-fa">ورود</span><span class="lang-en">Login</span></button>
             <button type="button" id="btn-open-register" role="menuitem"><span class="lang-fa">ثبت‌نام</span><span class="lang-en">Register</span></button>
             <button type="button" id="btn-logout" role="menuitem" hidden><span class="lang-fa">خروج</span><span class="lang-en">Logout</span></button>
@@ -1408,6 +1472,108 @@
     </section>
   </div>
 
+
+  <!-- ==================== VIEW: USER PANEL ==================== -->
+  <div id="view-panel" class="view">
+    <div class="panel-hero">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a data-view="home"><span class="lang-fa">خانه</span><span class="lang-en">Home</span></a>
+          <span>/</span>
+          <span class="lang-fa">پنل کاربری</span><span class="lang-en">User Panel</span>
+        </nav>
+        <h1 id="panel-title"><span class="lang-fa">پنل کاربری</span><span class="lang-en">User Panel</span></h1>
+        <p class="panel-sub" id="panel-welcome">—</p>
+        <p class="panel-sub" id="panel-member-since" style="margin-top:6px"></p>
+      </div>
+    </div>
+    <section class="section">
+      <div class="container">
+        <div class="panel-stats" aria-label="Account statistics">
+          <div class="panel-stat">
+            <div class="label"><span class="lang-fa">دارایی‌های ذخیره‌شده</span><span class="lang-en">Watchlist</span></div>
+            <div class="value" id="stat-watch-count">0</div>
+          </div>
+          <div class="panel-stat">
+            <div class="label"><span class="lang-fa">تعداد خرید</span><span class="lang-en">Buys</span></div>
+            <div class="value" id="stat-buy-count">0</div>
+          </div>
+          <div class="panel-stat">
+            <div class="label"><span class="lang-fa">تعداد فروش</span><span class="lang-en">Sells</span></div>
+            <div class="value" id="stat-sell-count">0</div>
+          </div>
+          <div class="panel-stat">
+            <div class="label"><span class="lang-fa">سود / زیان کل</span><span class="lang-en">Total P&amp;L</span></div>
+            <div class="value" id="stat-pnl">—</div>
+          </div>
+        </div>
+
+        <div class="panel-section-title">
+          <span><span class="lang-fa">دارایی‌های ذخیره‌شده</span><span class="lang-en">Saved Assets</span></span>
+          <button type="button" class="tool-btn" id="panel-add-sample" style="width:auto;padding:8px 14px;font-size:0.85rem">
+            <span class="lang-fa">افزودن از علاقه‌مندی‌ها</span><span class="lang-en">Add favorites</span>
+          </button>
+        </div>
+        <div id="watch-grid" class="watch-grid"></div>
+        <div id="watch-empty" class="panel-empty" style="display:none">
+          <p class="lang-fa">هنوز دارایی ذخیره نکرده‌اید. از صفحه اصلی روی ستاره کارت‌ها کلیک کنید یا دکمه بالا را بزنید.</p>
+          <p class="lang-en">No saved assets yet. Star cards on the homepage or use the button above.</p>
+        </div>
+
+        <div class="panel-section-title">
+          <span><span class="lang-fa">ثبت معامله (خرید / فروش)</span><span class="lang-en">Log Trade (Buy / Sell)</span></span>
+        </div>
+        <form class="trade-form" id="trade-form">
+          <div>
+            <label for="tr-asset"><span class="lang-fa">دارایی</span><span class="lang-en">Asset</span></label>
+            <input id="tr-asset" name="asset" required placeholder="مثلاً طلا ۱۸ / USD / BTC" maxlength="40">
+          </div>
+          <div>
+            <label for="tr-side"><span class="lang-fa">نوع</span><span class="lang-en">Side</span></label>
+            <select id="tr-side" name="side">
+              <option value="buy"><span class="lang-fa">خرید</span><span class="lang-en">Buy</span></option>
+              <option value="sell"><span class="lang-fa">فروش</span><span class="lang-en">Sell</span></option>
+            </select>
+          </div>
+          <div>
+            <label for="tr-qty"><span class="lang-fa">مقدار</span><span class="lang-en">Qty</span></label>
+            <input id="tr-qty" name="qty" type="number" min="0.0001" step="any" required value="1">
+          </div>
+          <div>
+            <label for="tr-price"><span class="lang-fa">قیمت واحد (تومان)</span><span class="lang-en">Unit price (Toman)</span></label>
+            <input id="tr-price" name="price" type="number" min="0" step="any" required>
+          </div>
+          <div>
+            <label for="tr-note"><span class="lang-fa">یادداشت</span><span class="lang-en">Note</span></label>
+            <input id="tr-note" name="note" maxlength="80" placeholder="اختیاری">
+          </div>
+          <button type="submit"><span class="lang-fa">ثبت</span><span class="lang-en">Save</span></button>
+        </form>
+
+        <div class="panel-section-title">
+          <span><span class="lang-fa">تاریخچه معاملات</span><span class="lang-en">Trade History</span></span>
+        </div>
+        <div class="trades-table-wrap">
+          <table class="trades-table">
+            <thead>
+              <tr>
+                <th><span class="lang-fa">تاریخ</span><span class="lang-en">Date</span></th>
+                <th><span class="lang-fa">دارایی</span><span class="lang-en">Asset</span></th>
+                <th><span class="lang-fa">نوع</span><span class="lang-en">Side</span></th>
+                <th><span class="lang-fa">مقدار</span><span class="lang-en">Qty</span></th>
+                <th><span class="lang-fa">قیمت</span><span class="lang-en">Price</span></th>
+                <th><span class="lang-fa">جمع</span><span class="lang-en">Total</span></th>
+              </tr>
+            </thead>
+            <tbody id="trades-tbody">
+              <tr><td colspan="6" class="na-text">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
     <div class="container">
@@ -1671,6 +1837,32 @@
         btn.classList.toggle('active');
         const svg = btn.querySelector('svg');
         svg.setAttribute('fill', btn.classList.contains('active') ? 'currentColor' : 'none');
+        // Watchlist sync
+        try {
+          var card = btn.closest('.price-card');
+          var nameEl = card && card.querySelector('.asset-name');
+          var symEl = card && card.querySelector('.asset-symbol');
+          var priceEl = card && card.querySelector('.price-value');
+          var changeEl = card && card.querySelector('.price-change');
+          if (!nameEl) return;
+          var name = (nameEl.textContent || '').replace(/داده موجود نیست/g,'').trim();
+          var item = {
+            id: (symEl && symEl.textContent || name).trim(),
+            name: name,
+            symbol: (symEl && symEl.textContent || '').trim(),
+            price: priceEl ? priceEl.textContent : '—',
+            change: changeEl ? changeEl.textContent : '—',
+            up: changeEl ? changeEl.classList.contains('up') : true
+          };
+          var list = JSON.parse(localStorage.getItem('finverse_watchlist') || '[]');
+          var idx = list.findIndex(function (x) { return x.id === item.id || x.name === item.name; });
+          if (btn.classList.contains('active')) {
+            if (idx < 0) list.push(item);
+          } else if (idx >= 0) {
+            list.splice(idx, 1);
+          }
+          localStorage.setItem('finverse_watchlist', JSON.stringify(list));
+        } catch (err) { console.warn(err); }
       });
     });
 
@@ -2786,6 +2978,190 @@
     }, 90000);
 
 
+
+    // ===== User Panel (watchlist + trades) =====
+    function getWatchlist() {
+      try { return JSON.parse(localStorage.getItem('finverse_watchlist') || '[]'); }
+      catch (e) { return []; }
+    }
+    function setWatchlist(list) {
+      localStorage.setItem('finverse_watchlist', JSON.stringify(list || []));
+    }
+    function getTrades() {
+      try { return JSON.parse(localStorage.getItem('finverse_trades') || '[]'); }
+      catch (e) { return []; }
+    }
+    function setTrades(list) {
+      localStorage.setItem('finverse_trades', JSON.stringify(list || []));
+    }
+    function fmtMoney(n) {
+      if (window.MarketAPI && MarketAPI.formatToman) return MarketAPI.formatToman(n);
+      return Math.round(n).toLocaleString('fa-IR');
+    }
+    function renderUserPanel() {
+      var state = (window.FinverseAuth && FinverseAuth.getState()) || {};
+      var user = state.user;
+      var profile = state.profile;
+      if (!user) {
+        showView('home');
+        return;
+      }
+      var name = (profile && profile.display_name) ||
+        (user.user_metadata && user.user_metadata.display_name) ||
+        (user.email || '').split('@')[0];
+      var welcome = document.getElementById('panel-welcome');
+      var sinceEl = document.getElementById('panel-member-since');
+      if (welcome) {
+        welcome.innerHTML = '<span class="lang-fa">سلام، <strong>' + name + '</strong></span>' +
+          '<span class="lang-en">Hello, <strong>' + name + '</strong></span>';
+      }
+      var created = user.created_at || (profile && profile.created_at);
+      if (sinceEl && created) {
+        var d = new Date(created);
+        var fa = d.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' });
+        var en = d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+        sinceEl.innerHTML = '<span class="lang-fa">عضویت از: ' + fa + '</span><span class="lang-en">Member since: ' + en + '</span>';
+      } else if (sinceEl) {
+        sinceEl.textContent = '';
+      }
+
+      var watch = getWatchlist();
+      var trades = getTrades();
+      var buys = trades.filter(function (t) { return t.side === 'buy'; }).length;
+      var sells = trades.filter(function (t) { return t.side === 'sell'; }).length;
+      // Approximate P&amp;L: sum(sell totals) - sum(buy totals)
+      var buySum = 0, sellSum = 0;
+      trades.forEach(function (t) {
+        var total = (Number(t.qty) || 0) * (Number(t.price) || 0);
+        if (t.side === 'buy') buySum += total;
+        else sellSum += total;
+      });
+      var pnl = sellSum - buySum;
+
+      var elW = document.getElementById('stat-watch-count');
+      var elB = document.getElementById('stat-buy-count');
+      var elS = document.getElementById('stat-sell-count');
+      var elP = document.getElementById('stat-pnl');
+      if (elW) elW.textContent = String(watch.length);
+      if (elB) elB.textContent = String(buys);
+      if (elS) elS.textContent = String(sells);
+      if (elP) {
+        elP.textContent = (pnl >= 0 ? '+' : '−') + fmtMoney(Math.abs(pnl)) + ' تومان';
+        elP.className = 'value ' + (pnl > 0 ? 'up' : (pnl < 0 ? 'down' : ''));
+      }
+
+      var grid = document.getElementById('watch-grid');
+      var empty = document.getElementById('watch-empty');
+      if (grid) {
+        if (!watch.length) {
+          grid.innerHTML = '';
+          if (empty) empty.style.display = 'block';
+        } else {
+          if (empty) empty.style.display = 'none';
+          grid.innerHTML = watch.map(function (a, i) {
+            var chClass = a.up ? 'up' : 'down';
+            return '<div class="watch-card" data-idx="' + i + '">' +
+              '<button type="button" class="rm" data-rm="' + i + '" aria-label="Remove">×</button>' +
+              '<div class="asset-name" style="font-weight:700;margin-bottom:6px">' + (a.name || a.id) + '</div>' +
+              '<div class="asset-symbol" style="color:var(--text-muted);font-size:0.8rem;margin-bottom:8px">' + (a.symbol || '') + '</div>' +
+              '<div class="price-value" style="font-size:1.15rem">' + (a.price || '—') + '</div>' +
+              '<div class="price-change ' + chClass + '">' + (a.change || '') + '</div></div>';
+          }).join('');
+          grid.querySelectorAll('[data-rm]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+              e.stopPropagation();
+              var idx = parseInt(btn.getAttribute('data-rm'), 10);
+              var list = getWatchlist();
+              list.splice(idx, 1);
+              setWatchlist(list);
+              renderUserPanel();
+            });
+          });
+        }
+      }
+
+      var tbody = document.getElementById('trades-tbody');
+      if (tbody) {
+        if (!trades.length) {
+          tbody.innerHTML = '<tr><td colspan="6" class="na-text"><span class="lang-fa">معامله‌ای ثبت نشده</span><span class="lang-en">No trades yet</span></td></tr>';
+        } else {
+          tbody.innerHTML = trades.slice().reverse().map(function (t) {
+            var total = (Number(t.qty) || 0) * (Number(t.price) || 0);
+            var sideFa = t.side === 'buy' ? 'خرید' : 'فروش';
+            var sideEn = t.side === 'buy' ? 'Buy' : 'Sell';
+            var cls = t.side === 'buy' ? 'up' : 'down';
+            var dt = t.at ? new Date(t.at).toLocaleString('fa-IR') : '—';
+            return '<tr><td>' + dt + '</td><td>' + (t.asset || '—') + '</td>' +
+              '<td class="' + cls + '"><span class="lang-fa">' + sideFa + '</span><span class="lang-en">' + sideEn + '</span></td>' +
+              '<td>' + t.qty + '</td><td>' + fmtMoney(t.price) + '</td><td>' + fmtMoney(total) + '</td></tr>';
+          }).join('');
+        }
+      }
+    }
+
+    document.getElementById('trade-form') && document.getElementById('trade-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!window.FinverseAuth || !FinverseAuth.isLoggedIn()) return;
+      var asset = document.getElementById('tr-asset').value.trim();
+      var side = document.getElementById('tr-side').value;
+      var qty = parseFloat(document.getElementById('tr-qty').value);
+      var price = parseFloat(document.getElementById('tr-price').value);
+      var note = document.getElementById('tr-note').value.trim();
+      if (!asset || !(qty > 0) || !(price >= 0)) return;
+      var list = getTrades();
+      list.push({ asset: asset, side: side, qty: qty, price: price, note: note, at: new Date().toISOString() });
+      setTrades(list);
+      e.target.reset();
+      document.getElementById('tr-qty').value = '1';
+      renderUserPanel();
+    });
+
+    document.getElementById('panel-add-sample') && document.getElementById('panel-add-sample').addEventListener('click', function () {
+      var list = getWatchlist();
+      var seeds = [
+        { id: 'Gold 18K', name: 'طلای ۱۸ عیار', symbol: 'Gold 18K', price: '—', change: '—', up: true },
+        { id: 'USD', name: 'دلار آمریکا', symbol: 'USD', price: '—', change: '—', up: true },
+        { id: 'BTC', name: 'بیت‌کوین', symbol: 'BTC', price: '—', change: '—', up: true }
+      ];
+      seeds.forEach(function (s) {
+        if (!list.some(function (x) { return x.id === s.id || x.symbol === s.symbol; })) list.push(s);
+      });
+      // refresh prices from live cards if possible
+      document.querySelectorAll('.price-card').forEach(function (card) {
+        var nameEl = card.querySelector('.asset-name');
+        var symEl = card.querySelector('.asset-symbol');
+        var priceEl = card.querySelector('.price-value');
+        var changeEl = card.querySelector('.price-change');
+        if (!nameEl || !symEl) return;
+        var sym = symEl.textContent.trim();
+        list.forEach(function (w) {
+          if (w.symbol === sym || (nameEl.textContent || '').indexOf(w.name.slice(0, 4)) !== -1) {
+            w.price = priceEl ? priceEl.textContent : w.price;
+            w.change = changeEl ? changeEl.textContent : w.change;
+            w.up = changeEl ? changeEl.classList.contains('up') : w.up;
+          }
+        });
+      });
+      setWatchlist(list);
+      renderUserPanel();
+    });
+
+    // Guard panel route
+    var _showViewPanel = showView;
+    showView = function (name) {
+      if (name === 'panel') {
+        if (!window.FinverseAuth || !FinverseAuth.isLoggedIn()) {
+          _showViewPanel('home');
+          var b = document.getElementById('btn-open-login');
+          if (b) b.click();
+          return;
+        }
+      }
+      _showViewPanel(name);
+      if (name === 'panel') renderUserPanel();
+    };
+
+
     // ===== Auth UI (Supabase) =====
     (function setupAuthUI() {
       var overlay = document.getElementById('auth-overlay');
@@ -2839,6 +3215,20 @@
         if (!userMenu.contains(e.target)) userMenu.classList.remove('open');
       });
 
+      
+      var panelBtn = document.getElementById('user-panel-label');
+      if (panelBtn) {
+        panelBtn.addEventListener('click', function () {
+          userMenu.classList.remove('open');
+          if (window.FinverseAuth && FinverseAuth.isLoggedIn()) {
+            showView('panel');
+            if (typeof renderUserPanel === 'function') renderUserPanel();
+          } else {
+            openAuth('login');
+          }
+        });
+      }
+
       document.getElementById('btn-logout').addEventListener('click', function () {
         if (window.FinverseAuth) FinverseAuth.signOut();
         userMenu.classList.remove('open');
@@ -2876,12 +3266,16 @@
           errEl.classList.add('show');
           return;
         }
-        if (res.needsEmailConfirm) {
-          okEl.textContent = 'ثبت‌نام انجام شد. در صورت فعال بودن تأیید ایمیل، صندوق ورودی را بررسی کنید.';
+        if (mode === 'register') {
+          okEl.textContent = 'ثبت‌نام با موفقیت انجام شد. اکنون وارد شوید.';
           okEl.classList.add('show');
-        } else {
-          closeAuth();
+          form.reset();
+          setMode('login');
+          // keep success visible on login tab
+          okEl.classList.add('show');
+          return;
         }
+        closeAuth();
       });
 
       function renderAuth(state) {
@@ -2910,7 +3304,8 @@
             mobAuth.onclick = function (e) {
               e.preventDefault();
               closeMobileNav();
-              userMenu.classList.add('open');
+              showView('panel');
+              if (typeof renderUserPanel === 'function') renderUserPanel();
             };
           }
         } else {
