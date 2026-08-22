@@ -677,23 +677,6 @@
       color: var(--text-muted); cursor: pointer; font-size: 0.9rem;
     }
     .watch-card .rm:hover { color: var(--down); }
-    .trade-form {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-      padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; align-items: end;
-    }
-    .trade-form label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 6px; }
-    .trade-form input, .trade-form select {
-      width: 100%; background: var(--input-bg); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text);
-    }
-    .trade-form button {
-      background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm);
-      padding: 11px 16px; font-weight: 700; cursor: pointer;
-    }
-    .trades-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-card); }
-    .trades-table { width: 100%; border-collapse: collapse; min-width: 640px; }
-    .trades-table th, .trades-table td { padding: 12px 14px; text-align: right; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-    .trades-table th { background: var(--bg-elevated); color: var(--text-muted); font-size: 0.78rem; }
     .panel-empty {
       text-align: center; padding: 36px 16px; color: var(--text-muted);
       border: 1px dashed var(--border); border-radius: var(--radius-lg); background: var(--bg-card);
@@ -705,266 +688,282 @@
       .panel-stats { grid-template-columns: 1fr; }
     }
 
-    /* HOME REDESIGN V2 — scoped to #view-home only */
-    #view-home {
-      --home-accent: var(--primary);
-      --home-glow: color-mix(in srgb, var(--primary) 18%, transparent);
-    }
-    #view-home .hero {
-      position: relative;
-      padding: 64px 0 48px;
+    
+    /* ========== HOME V3 — glass + motion (scoped) ========== */
+    #view-home .home-v3 {
+      --glass: color-mix(in srgb, var(--bg-card) 62%, transparent);
+      --glass-border: color-mix(in srgb, #fff 10%, var(--border));
+      --glass-blur: 16px;
       overflow: hidden;
-      border-bottom: 1px solid var(--border);
-      background:
-        radial-gradient(900px 420px at 85% -10%, var(--home-glow), transparent 60%),
-        radial-gradient(700px 360px at 10% 110%, color-mix(in srgb, #8b5cf6 12%, transparent), transparent 55%),
-        linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%);
     }
-    #view-home .hero::before {
+    #view-home .glass {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    }
+
+    /* Hero */
+    #view-home .hv3-hero {
+      position: relative;
+      padding: 56px 0 40px;
+      isolation: isolate;
+    }
+    #view-home .hv3-hero-bg {
+      position: absolute; inset: 0; z-index: -1;
+      background:
+        radial-gradient(700px 380px at 15% 0%, color-mix(in srgb, var(--primary) 28%, transparent), transparent 60%),
+        radial-gradient(600px 360px at 90% 20%, color-mix(in srgb, #8b5cf6 22%, transparent), transparent 55%),
+        radial-gradient(500px 300px at 50% 100%, color-mix(in srgb, #06b6d4 12%, transparent), transparent 50%),
+        var(--bg);
+    }
+    #view-home .hv3-hero-bg::after {
       content: "";
       position: absolute; inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 48px 48px;
-      opacity: 0.25;
-      mask-image: linear-gradient(180deg, #000 20%, transparent 95%);
-      pointer-events: none;
+      background-image: radial-gradient(var(--border) 1px, transparent 1px);
+      background-size: 22px 22px;
+      opacity: 0.35;
+      mask-image: linear-gradient(180deg, #000, transparent 90%);
     }
-    #view-home .hero-content {
-      position: relative;
-      text-align: start;
-      max-width: 720px;
-      margin: 0;
+    #view-home .hv3-hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr;
+      gap: 28px;
+      align-items: stretch;
     }
-    #view-home .hero-kicker {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 12px; border-radius: 999px;
-      border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--bg-card) 80%, transparent);
-      color: var(--text-secondary); font-size: 0.78rem; font-weight: 700;
-      letter-spacing: 0.02em; margin-bottom: 18px;
-    }
-    #view-home .hero-kicker i {
-      width: 8px; height: 8px; border-radius: 50%; background: var(--up);
-      box-shadow: 0 0 0 4px var(--up-bg); display: inline-block;
-    }
-    #view-home .hero h1 {
-      font-size: clamp(1.9rem, 4.4vw, 2.85rem);
-      font-weight: 800; line-height: 1.2; margin-bottom: 14px;
-      letter-spacing: -0.03em;
+    #view-home .hv3-hero-copy h1 {
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      margin: 14px 0 14px;
+      color: var(--text);
       background: none;
       -webkit-text-fill-color: unset;
-      color: var(--text);
     }
-    #view-home .hero h1 span.grad {
-      background: linear-gradient(120deg, var(--primary), #8b5cf6 55%, #06b6d4);
+    #view-home .hv3-hero-copy h1 em {
+      font-style: normal;
+      background: linear-gradient(120deg, #60a5fa, #a78bfa 50%, #22d3ee);
       -webkit-background-clip: text; background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    #view-home .hero p {
-      color: var(--text-secondary); font-size: 1.05rem;
-      max-width: 540px; margin-bottom: 26px; line-height: 1.75;
-    }
-    #view-home .hero-search-wrap { max-width: 560px; margin: 0; }
-    #view-home .hero-search {
-      background: color-mix(in srgb, var(--bg-card) 92%, transparent);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 8px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-      backdrop-filter: blur(10px);
-    }
-    #view-home .hero-search input { padding: 14px 16px; font-size: 0.98rem; }
-    #view-home .hero-search button {
-      border-radius: 12px; padding: 12px 22px;
-      background: linear-gradient(135deg, var(--primary), #6366f1);
-      box-shadow: 0 6px 18px color-mix(in srgb, var(--primary) 35%, transparent);
-    }
-    #view-home .hero-search button:hover { filter: brightness(1.06); }
-
-    #view-home .home-section {
-      padding: 40px 0;
-    }
-    #view-home .home-section.alt {
-      background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--bg-elevated) 70%, transparent) 30%, transparent);
-    }
-    #view-home .section-head {
-      display: flex; flex-wrap: wrap; align-items: flex-end;
-      justify-content: space-between; gap: 12px 20px;
+    #view-home .hv3-hero-copy p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      max-width: 34rem;
       margin-bottom: 22px;
+      line-height: 1.75;
     }
-    #view-home .section-head .eyebrow {
-      font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--primary); margin-bottom: 6px;
+    #view-home .hv3-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 12px; border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: color-mix(in srgb, var(--bg-card) 55%, transparent);
+      backdrop-filter: blur(10px);
+      font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);
+      animation: hv3-fade-up 0.55s ease both;
     }
-    #view-home .section-title {
-      font-size: 1.35rem; margin-bottom: 0; font-weight: 800; letter-spacing: -0.02em;
+    #view-home .hv3-live {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--up);
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--up) 50%, transparent);
+      animation: hv3-pulse 1.8s ease-out infinite;
     }
-    #view-home .section-subtitle {
-      margin: 0; color: var(--text-muted); font-size: 0.9rem;
+    #view-home .hv3-search {
+      border-radius: 18px; padding: 8px; max-width: 560px;
+      animation: hv3-fade-up 0.65s ease 0.05s both;
+    }
+    #view-home .hv3-search .hero-search {
+      margin: 0; max-width: none; border: none; background: transparent;
+      box-shadow: none; padding: 0; display: flex; gap: 8px;
+    }
+    #view-home .hv3-search .hero-search input {
+      flex: 1; background: color-mix(in srgb, var(--input-bg) 80%, transparent);
+      border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px;
+    }
+    #view-home .hv3-search .hero-search button {
+      border-radius: 12px; padding: 12px 20px;
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      box-shadow: 0 8px 22px color-mix(in srgb, var(--primary) 35%, transparent);
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+    #view-home .hv3-search .hero-search button:hover { transform: translateY(-1px); filter: brightness(1.06); }
+    #view-home .hv3-hero-meta { margin-top: 16px; animation: hv3-fade-up 0.7s ease 0.1s both; }
+    #view-home .hv3-hero-meta .datetime-bar {
+      margin: 0; justify-content: flex-start; gap: 8px;
+      padding: 8px; border-radius: 14px; background: transparent; border: none; box-shadow: none;
+      flex-wrap: wrap;
+    }
+    #view-home .hv3-hero-meta .dt-item {
+      padding: 6px 12px; border-radius: 999px;
+      background: color-mix(in srgb, var(--bg-card) 55%, transparent);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      font-size: 0.82rem;
     }
 
-    #view-home .datetime-bar {
-      justify-content: flex-start;
-      gap: 10px 14px;
-      padding: 10px 14px;
-      margin-bottom: 28px;
-      border-radius: 999px;
-      background: color-mix(in srgb, var(--bg-card) 85%, transparent);
-      border: 1px solid var(--border);
-      box-shadow: none;
-      font-size: 0.84rem;
+    #view-home .hv3-hero-side {
+      border-radius: 22px; padding: 18px;
+      animation: hv3-fade-up 0.7s ease 0.08s both;
+      display: flex; flex-direction: column; gap: 12px;
     }
-    #view-home .datetime-bar .dt-item {
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: var(--bg-hover);
+    #view-home .hv3-side-title {
+      font-weight: 800; font-size: 0.95rem; margin-bottom: 4px;
     }
-    #view-home .datetime-bar strong { font-variant-numeric: tabular-nums; }
-
-    #view-home .status-grid { gap: 14px; }
-    #view-home .status-card {
-      position: relative;
-      padding: 18px 18px 16px;
-      border-radius: 16px;
-      background: linear-gradient(160deg, var(--bg-card), color-mix(in srgb, var(--bg-elevated) 80%, var(--bg-card)));
-      overflow: hidden;
+    #view-home .hv3-hero-side .status-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
-    #view-home .status-card::before {
-      content: "";
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--primary), transparent);
-      opacity: 0.85;
+    #view-home .hv3-hero-side .status-card {
+      padding: 14px;
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--bg) 35%, transparent);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(8px);
+      transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
     }
-    #view-home .status-card:hover {
+    #view-home .hv3-hero-side .status-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+      border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+      background: color-mix(in srgb, var(--bg-card) 50%, transparent);
     }
-    #view-home .status-value { font-size: 1.2rem; letter-spacing: -0.02em; }
-    #view-home .status-bar { height: 3px; border-radius: 999px; }
-    #view-home .status-icon { border-radius: 12px; }
+    #view-home .hv3-hero-side .status-value { font-size: 1.05rem; }
+    #view-home .hv3-hero-side .status-bar { height: 3px; }
 
+    /* Blocks */
+    #view-home .hv3-block { padding: 42px 0; }
+    #view-home .hv3-block-dim {
+      background: linear-gradient(180deg,
+        transparent,
+        color-mix(in srgb, var(--bg-elevated) 55%, transparent) 40%,
+        transparent);
+    }
+    #view-home .hv3-head {
+      display: flex; flex-wrap: wrap; align-items: flex-end;
+      justify-content: space-between; gap: 12px; margin-bottom: 18px;
+    }
+    #view-home .hv3-tag {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 9px;
+      font-size: 0.72rem; font-weight: 800;
+      color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 14%, transparent);
+      border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+      margin-inline-end: 10px; vertical-align: middle;
+    }
+    #view-home .hv3-head .section-title {
+      display: inline; font-size: 1.3rem; margin: 0; letter-spacing: -0.02em;
+    }
+    #view-home .hv3-split {
+      display: grid; grid-template-columns: 1fr 1.1fr; gap: 28px; align-items: start;
+    }
+
+    /* Price cards glass */
     #view-home .market-grid { gap: 14px; }
     #view-home .price-card {
+      position: relative;
+      border-radius: 18px;
       padding: 18px;
-      border-radius: 16px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      box-shadow: none;
+      background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px) saturate(130%);
+      -webkit-backdrop-filter: blur(12px) saturate(130%);
+      transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), border-color 0.25s ease, box-shadow 0.25s ease;
+      animation: hv3-fade-up 0.5s ease both;
     }
+    #view-home .price-card:nth-child(1) { animation-delay: 0.02s; }
+    #view-home .price-card:nth-child(2) { animation-delay: 0.06s; }
+    #view-home .price-card:nth-child(3) { animation-delay: 0.1s; }
+    #view-home .price-card:nth-child(4) { animation-delay: 0.14s; }
+    #view-home .price-card:nth-child(5) { animation-delay: 0.18s; }
+    #view-home .price-card:nth-child(6) { animation-delay: 0.22s; }
     #view-home .price-card:hover {
-      border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
-      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
-      transform: translateY(-3px);
-    }
-    #view-home .price-card::after {
-      content: "";
-      position: absolute; inset-inline-start: 0; top: 16px; bottom: 16px;
-      width: 3px; border-radius: 999px;
-      background: linear-gradient(180deg, var(--primary), transparent);
-      opacity: 0.55;
+      transform: translateY(-5px) scale(1.01);
+      border-color: color-mix(in srgb, var(--primary) 50%, var(--border));
+      box-shadow: 0 18px 40px rgba(0,0,0,0.16);
     }
     #view-home .price-value {
-      font-size: 1.45rem;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.03em;
-      margin-top: 4px;
+      font-size: 1.4rem; font-variant-numeric: tabular-nums; letter-spacing: -0.03em;
     }
     #view-home .asset-icon {
-      width: 40px; height: 40px;
-      border-radius: 12px;
-      background: linear-gradient(145deg, var(--bg-hover), var(--bg-elevated));
-      border: 1px solid var(--border);
-    }
-    #view-home .card-footer {
-      margin-top: 12px; padding-top: 10px;
-      border-top: 1px dashed var(--border);
+      border-radius: 14px; border: 1px solid var(--glass-border);
+      background: color-mix(in srgb, var(--bg-hover) 80%, transparent);
     }
     #view-home .update-info {
-      display: inline-flex;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      margin-bottom: 16px;
+      display: inline-flex; margin-bottom: 14px;
+      padding: 7px 12px; border-radius: 999px;
+      background: color-mix(in srgb, var(--bg-card) 55%, transparent);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(8px);
     }
 
-    #view-home .gl-grid { gap: 16px; }
-    #view-home .gl-card {
-      border-radius: 16px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+    /* Gainers / changes / tools */
+    #view-home .gl-card,
+    #view-home .changes-list,
+    #view-home .tool-card {
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--bg-card) 68%, transparent);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.08);
     }
     #view-home .gl-header {
-      padding: 14px 18px;
-      background: color-mix(in srgb, var(--bg-elevated) 80%, transparent);
-      font-size: 0.92rem;
+      background: color-mix(in srgb, var(--bg-elevated) 55%, transparent);
+      backdrop-filter: blur(8px);
     }
-    #view-home .gl-item { padding: 12px 18px; }
-    #view-home .gl-change { font-variant-numeric: tabular-nums; }
-
-    #view-home .changes-list {
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
+    #view-home .gl-item,
     #view-home .change-item {
-      padding: 14px 18px;
-      border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+      transition: background 0.2s ease, transform 0.2s ease;
     }
-    #view-home .change-time {
-      font-variant-numeric: tabular-nums;
-      font-weight: 700;
-      color: var(--text-secondary);
-      min-width: 56px;
+    #view-home .gl-item:hover,
+    #view-home .change-item:hover {
+      background: color-mix(in srgb, var(--bg-hover) 70%, transparent);
     }
-
-    #view-home .tools-grid { gap: 16px; }
     #view-home .tool-card {
-      border-radius: 16px;
-      padding: 22px;
-      background:
-        linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 100%, transparent), var(--bg-card)),
-        var(--bg-card);
-      border: 1px solid var(--border);
+      transition: transform 0.25s ease, border-color 0.25s ease;
     }
-    #view-home .tool-card h3 {
-      font-size: 1rem;
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid var(--border);
+    #view-home .tool-card:hover {
+      transform: translateY(-3px);
+      border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
     }
     #view-home .tool-btn {
-      border-radius: 10px;
       background: linear-gradient(135deg, var(--primary), #4f46e5);
+      transition: transform 0.2s ease, filter 0.2s ease;
     }
-    #view-home .tool-result {
-      border-radius: 12px;
-      background: color-mix(in srgb, var(--bg-hover) 90%, transparent);
+    #view-home .tool-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    #view-home .tools-grid { gap: 14px; }
+
+    @keyframes hv3-pulse {
+      0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--up) 55%, transparent); }
+      70% { box-shadow: 0 0 0 10px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    @keyframes hv3-fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #view-home * { animation: none !important; transition: none !important; }
     }
 
-    #view-home .market-summary-box {
-      border-radius: 18px;
-      padding: 24px 26px;
-      border: 1px solid var(--border);
-      background:
-        radial-gradient(500px 180px at 100% 0%, var(--home-glow), transparent 60%),
-        var(--bg-card);
-      margin-bottom: 28px;
+    @media (max-width: 1024px) {
+      #view-home .hv3-hero-grid { grid-template-columns: 1fr; }
+      #view-home .hv3-split { grid-template-columns: 1fr; }
     }
-    #view-home .market-summary-box h2 {
-      font-size: 1.15rem;
-      margin-bottom: 10px;
-    }
-
     @media (max-width: 768px) {
-      #view-home .hero { padding: 40px 0 28px; }
-      #view-home .hero-content { text-align: center; }
-      #view-home .hero p { margin-left: auto; margin-right: auto; }
-      #view-home .hero-search-wrap { margin: 0 auto; }
-      #view-home .datetime-bar { border-radius: 16px; justify-content: center; }
-      #view-home .price-card::after { display: none; }
+      #view-home .hv3-hero { padding: 36px 0 24px; }
+      #view-home .hv3-hero-copy h1 { text-align: center; }
+      #view-home .hv3-hero-copy p { text-align: center; margin-left: auto; margin-right: auto; }
+      #view-home .hv3-pill { margin: 0 auto; display: flex; width: max-content; }
+      #view-home .hv3-search { margin: 0 auto; }
+      #view-home .hv3-hero-side .status-grid { grid-template-columns: 1fr 1fr; }
+      #view-home .tools-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      #view-home .hv3-hero-side .status-grid { grid-template-columns: 1fr; }
+      #view-home .hv3-search .hero-search { flex-direction: column; }
+      #view-home .hv3-search .hero-search button { width: 100%; }
     }
 
   </style>
@@ -1049,51 +1048,47 @@
 
   <!-- ==================== VIEW: HOME ==================== -->
   <div id="view-home" class="view active">
-    <section class="hero">
-      <div class="container">
-        <div class="hero-content">
-          <div class="hero-kicker"><i aria-hidden="true"></i>
-            <span class="lang-fa">بازار زنده · TGJU</span>
-            <span class="lang-en">Live markets · TGJU</span>
-          </div>
-          <h1>
-            <span class="lang-fa">قیمت لحظه‌ای <span class="grad">بازارهای مالی</span></span>
-            <span class="lang-en">Real-time <span class="grad">Financial Markets</span></span>
-          </h1>
-          <p><span class="lang-fa">دسترسی سریع به قیمت طلا، نقره، ارز، بورس و رمزارزها با رابط حرفه‌ای فاینورس</span><span class="lang-en">Quick access to gold, silver, forex, stocks and crypto with Finverse’s professional interface</span></p>
-          <div class="hero-search-wrap" style="position:relative;max-width:560px">
-            <div class="hero-search">
-              <input type="search" id="hero-search-input" autocomplete="off" placeholder="جستجوی سریع: طلا، دلار، بیت‌کوین..." aria-autocomplete="list" aria-controls="search-dropdown">
-              <button type="button" id="hero-search-btn"><span class="lang-fa">جستجو</span><span class="lang-en">Search</span></button>
+    <!-- Home redesign root -->
+    <div class="home-v3">
+      <section class="hv3-hero" aria-label="Hero">
+        <div class="hv3-hero-bg" aria-hidden="true"></div>
+        <div class="container hv3-hero-grid">
+          <div class="hv3-hero-copy">
+            <div class="hv3-pill">
+              <span class="hv3-live"></span>
+              <span class="lang-fa">بازار زنده</span>
+              <span class="lang-en">Live market</span>
             </div>
-            <div class="search-dropdown" id="search-dropdown" role="listbox"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section home-section">
-      <div class="container">
-        <div class="datetime-bar" id="datetime-bar" aria-live="polite">
+            <h1>
+              <span class="lang-fa">مرکز قیمت <em>لحظه‌ای</em> بازار</span>
+              <span class="lang-en">Your <em>real-time</em> market desk</span>
+            </h1>
+            <p>
+              <span class="lang-fa">طلا، ارز، رمزارز و شاخص‌ها در یک داشبورد شفاف و سریع — طراحی‌شده برای تصمیم‌گیری بهتر.</span>
+              <span class="lang-en">Gold, FX, crypto and indices in one clear, fast dashboard — built for better decisions.</span>
+            </p>
+            <div class="hv3-search glass" style="position:relative">
+              <div class="hero-search">
+                <input type="search" id="hero-search-input" autocomplete="off" placeholder="جستجوی سریع: طلا، دلار، بیت‌کوین..." aria-autocomplete="list" aria-controls="search-dropdown">
+                <button type="button" id="hero-search-btn"><span class="lang-fa">جستجو</span><span class="lang-en">Search</span></button>
+              </div>
+              <div class="search-dropdown" id="search-dropdown" role="listbox"></div>
+            </div>
+            <div class="hv3-hero-meta">
+              <div class="datetime-bar" id="datetime-bar" aria-live="polite">
           <div class="dt-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             <span class="lang-fa">شمسی:</span><span class="lang-en">Jalali:</span>
             <strong id="dt-jalali">—</strong>
           </div>
-          <div class="dt-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            <span class="lang-fa">میلادی:</span><span class="lang-en">Gregorian:</span>
-            <strong id="dt-gregorian">—</strong>
+            </div>
           </div>
-          <div class="dt-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            <span class="lang-fa">ساعت:</span><span class="lang-en">Time:</span>
-            <strong id="dt-clock">—</strong>
-          </div>
-        </div>
-<h2 class="section-title"><span class="lang-fa">وضعیت کلی بازار</span><span class="lang-en">Market Overview</span></h2>
-        <p class="section-subtitle"><span class="lang-fa">خلاصه عملکرد بازارهای اصلی</span><span class="lang-en">Summary of major markets</span></p>
-        <div class="status-grid">
+          <div class="hv3-hero-side glass">
+            <div class="hv3-side-title">
+              <span class="lang-fa">نمای سریع بازار</span>
+              <span class="lang-en">Market snapshot</span>
+            </div>
+            <div class="status-grid">
           <div class="status-card">
             <div class="status-card-top"><span class="status-label"><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></span><div class="status-icon" style="background:var(--accent-bg)"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div></div>
             <div class="status-value"><span class="lang-fa">صعودی</span><span class="lang-en">Bullish</span></div>
@@ -1119,23 +1114,24 @@
             <div class="status-bar"><div class="status-bar-fill up" style="width:85%"></div></div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="section home-section" style="background:var(--bg-elevated)">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <div class="eyebrow">Watchlist</div>
-            <h2 class="section-title"><span class="lang-fa">قیمت‌های مهم روز</span><span class="lang-en">Key Prices</span></h2>
           </div>
-          <p class="section-subtitle"><span class="lang-fa">روی کارت‌ها کلیک کنید</span><span class="lang-en">Click cards for details</span></p>
         </div>
-        <div class="update-info" style="margin-bottom:20px"><span class="dot"></span>
+      </section>
+
+      <section class="hv3-block">
+        <div class="container">
+          <div class="hv3-head">
+            <div>
+              <span class="hv3-tag">01</span>
+              <h2 class="section-title"><span class="lang-fa">قیمت‌های مهم روز</span><span class="lang-en">Key Prices</span></h2>
+            </div>
+            <p class="section-subtitle"><span class="lang-fa">کلیک روی کارت برای جزئیات</span><span class="lang-en">Click a card for details</span></p>
+          </div>
+          <div class="update-info" style="margin-bottom:20px"><span class="dot"></span>
           <span class="lang-fa">آخرین به‌روزرسانی: ۱۵:۳۰ | منبع نمونه</span>
           <span class="lang-en">Last update: 15:30 | Sample source</span>
         </div>
-        <div class="market-grid">
+          <div class="market-grid">
           <div class="price-card" data-view="asset" data-asset="gold18">
             <div class="price-card-header">
               <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div><div><div class="asset-name"><span class="lang-fa">طلای ۱۸ عیار</span><span class="lang-en">18K Gold</span></div><div class="asset-symbol">Gold 18K</div></div></div>
@@ -1191,18 +1187,18 @@
             <div class="card-footer update-info"><span class="lang-fa">واحد</span><span class="lang-en">Points</span></div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="section home-section">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <div class="eyebrow">Movers</div>
-            <h2 class="section-title"><span class="lang-fa">بیشترین رشد و افت</span><span class="lang-en">Top Gainers & Losers</span></h2>
-          </div>
         </div>
-        <div class="gl-grid">
+      </section>
+
+      <section class="hv3-block hv3-block-dim">
+        <div class="container">
+          <div class="hv3-head">
+            <div>
+              <span class="hv3-tag">02</span>
+              <h2 class="section-title"><span class="lang-fa">بیشترین رشد و افت</span><span class="lang-en">Top Gainers & Losers</span></h2>
+            </div>
+          </div>
+          <div class="gl-grid">
           <div class="gl-card">
             <div class="gl-header gainers"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg> <span class="lang-fa">بیشترین رشد</span><span class="lang-en">Top Gainers</span></div>
             <div class="gl-list">
@@ -1220,34 +1216,32 @@
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="section home-section" style="background:var(--bg-elevated)">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <div class="eyebrow">Activity</div>
-            <h2 class="section-title"><span class="lang-fa">آخرین تغییرات</span><span class="lang-en">Latest Changes</span></h2>
-          </div>
         </div>
-        <div class="changes-list">
+      </section>
+
+      <section class="hv3-block">
+        <div class="container hv3-split">
+          <div>
+            <div class="hv3-head">
+              <div>
+                <span class="hv3-tag">03</span>
+                <h2 class="section-title"><span class="lang-fa">آخرین تغییرات</span><span class="lang-en">Latest Changes</span></h2>
+              </div>
+            </div>
+            <div class="changes-list">
           <div class="change-item"><span class="change-time">۱۵:۲۸</span><div class="change-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></span> <span class="lang-fa">طلای ۱۸</span><span class="lang-en">18K Gold</span></div><span class="change-desc"><span class="lang-fa">عبور از سطح ۴,۱۲۰,۰۰۰</span><span class="lang-en">Crossed 4,120,000 level</span></span><span class="change-value up">+۱.۲۴٪</span></div>
           <div class="change-item"><span class="change-time">۱۵:۲۲</span><div class="change-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 8h5a2.5 2.5 0 0 1 0 5H9zm0 5h5.5a2.5 2.5 0 0 1 0 5H9zM10 6v2M13 6v2M10 16v2M13 16v2"/></svg></span> BTC</div><span class="change-desc"><span class="lang-fa">افزایش حجم معاملات</span><span class="lang-en">Volume increase</span></span><span class="change-value up">+۲.۱۵٪</span></div>
           <div class="change-item"><span class="change-time">۱۵:۱۵</span><div class="change-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M15 9.5c0-1.5-1.3-2.5-3-2.5S9 8 9 9.5 10.3 11 12 11s3 1 3 2.5-1.3 2.5-3 2.5-3-1-3-2.5"/></svg></span> USD</div><span class="change-desc"><span class="lang-fa">کاهش جزئی</span><span class="lang-en">Slight decline</span></span><span class="change-value down">−۰.۳۸٪</span></div>
         </div>
-      </div>
-    </section>
-
-    <section class="section home-section">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <div class="eyebrow">Tools</div>
-            <h2 class="section-title"><span class="lang-fa">ابزارهای سریع</span><span class="lang-en">Quick Tools</span></h2>
           </div>
-        </div>
-        <div class="tools-grid">
+          <div>
+            <div class="hv3-head">
+              <div>
+                <span class="hv3-tag">04</span>
+                <h2 class="section-title"><span class="lang-fa">ابزارهای سریع</span><span class="lang-en">Quick Tools</span></h2>
+              </div>
+            </div>
+            <div class="tools-grid">
           <div class="tool-card">
             <h3><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg> <span class="lang-fa">محاسبه طلا</span><span class="lang-en">Gold Calculator</span></h3>
             <div class="tool-form">
@@ -1281,9 +1275,13 @@
               <div class="tool-result" id="pl-result"><div class="tool-result-label"><span class="lang-fa">سود / زیان</span><span class="lang-en">P&L</span></div><div class="tool-result-value" id="pl-result-value">—</div></div>
             </div>
           </div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
+
+    </div>
+    </div>
   </div>
 
   <!-- ==================== VIEW: GOLD CATEGORY ==================== -->
@@ -1779,22 +1777,10 @@
     </div>
     <section class="section">
       <div class="container">
-        <div class="panel-stats" aria-label="Account statistics">
+        <div class="panel-stats" aria-label="Account statistics" style="grid-template-columns:1fr">
           <div class="panel-stat">
             <div class="label"><span class="lang-fa">دارایی‌های ذخیره‌شده</span><span class="lang-en">Watchlist</span></div>
             <div class="value" id="stat-watch-count">0</div>
-          </div>
-          <div class="panel-stat">
-            <div class="label"><span class="lang-fa">تعداد خرید</span><span class="lang-en">Buys</span></div>
-            <div class="value" id="stat-buy-count">0</div>
-          </div>
-          <div class="panel-stat">
-            <div class="label"><span class="lang-fa">تعداد فروش</span><span class="lang-en">Sells</span></div>
-            <div class="value" id="stat-sell-count">0</div>
-          </div>
-          <div class="panel-stat">
-            <div class="label"><span class="lang-fa">سود / زیان کل</span><span class="lang-en">Total P&amp;L</span></div>
-            <div class="value" id="stat-pnl">—</div>
           </div>
         </div>
 
@@ -1809,58 +1795,7 @@
           <p class="lang-fa">هنوز دارایی ذخیره نکرده‌اید. از صفحه اصلی روی ستاره کارت‌ها کلیک کنید یا دکمه بالا را بزنید.</p>
           <p class="lang-en">No saved assets yet. Star cards on the homepage or use the button above.</p>
         </div>
-
-        <div class="panel-section-title">
-          <span><span class="lang-fa">ثبت معامله (خرید / فروش)</span><span class="lang-en">Log Trade (Buy / Sell)</span></span>
-        </div>
-        <form class="trade-form" id="trade-form">
-          <div>
-            <label for="tr-asset"><span class="lang-fa">دارایی</span><span class="lang-en">Asset</span></label>
-            <input id="tr-asset" name="asset" required placeholder="مثلاً طلا ۱۸ / USD / BTC" maxlength="40">
-          </div>
-          <div>
-            <label for="tr-side"><span class="lang-fa">نوع</span><span class="lang-en">Side</span></label>
-            <select id="tr-side" name="side">
-              <option value="buy"><span class="lang-fa">خرید</span><span class="lang-en">Buy</span></option>
-              <option value="sell"><span class="lang-fa">فروش</span><span class="lang-en">Sell</span></option>
-            </select>
-          </div>
-          <div>
-            <label for="tr-qty"><span class="lang-fa">مقدار</span><span class="lang-en">Qty</span></label>
-            <input id="tr-qty" name="qty" type="number" min="0.0001" step="any" required value="1">
-          </div>
-          <div>
-            <label for="tr-price"><span class="lang-fa">قیمت واحد (تومان)</span><span class="lang-en">Unit price (Toman)</span></label>
-            <input id="tr-price" name="price" type="number" min="0" step="any" required>
-          </div>
-          <div>
-            <label for="tr-note"><span class="lang-fa">یادداشت</span><span class="lang-en">Note</span></label>
-            <input id="tr-note" name="note" maxlength="80" placeholder="اختیاری">
-          </div>
-          <button type="submit"><span class="lang-fa">ثبت</span><span class="lang-en">Save</span></button>
-        </form>
-
-        <div class="panel-section-title">
-          <span><span class="lang-fa">تاریخچه معاملات</span><span class="lang-en">Trade History</span></span>
-        </div>
-        <div class="trades-table-wrap">
-          <table class="trades-table">
-            <thead>
-              <tr>
-                <th><span class="lang-fa">تاریخ</span><span class="lang-en">Date</span></th>
-                <th><span class="lang-fa">دارایی</span><span class="lang-en">Asset</span></th>
-                <th><span class="lang-fa">نوع</span><span class="lang-en">Side</span></th>
-                <th><span class="lang-fa">مقدار</span><span class="lang-en">Qty</span></th>
-                <th><span class="lang-fa">قیمت</span><span class="lang-en">Price</span></th>
-                <th><span class="lang-fa">جمع</span><span class="lang-en">Total</span></th>
-              </tr>
-            </thead>
-            <tbody id="trades-tbody">
-              <tr><td colspan="6" class="na-text">—</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+</div>
     </section>
   </div>
 
@@ -3269,20 +3204,13 @@
 
 
 
-    // ===== User Panel (watchlist + trades) =====
+    // ===== User Panel (watchlist) =====
     function getWatchlist() {
       try { return JSON.parse(localStorage.getItem('finverse_watchlist') || '[]'); }
       catch (e) { return []; }
     }
     function setWatchlist(list) {
       localStorage.setItem('finverse_watchlist', JSON.stringify(list || []));
-    }
-    function getTrades() {
-      try { return JSON.parse(localStorage.getItem('finverse_trades') || '[]'); }
-      catch (e) { return []; }
-    }
-    function setTrades(list) {
-      localStorage.setItem('finverse_trades', JSON.stringify(list || []));
     }
     function fmtMoney(n) {
       if (window.MarketAPI && MarketAPI.formatToman) return MarketAPI.formatToman(n);
@@ -3316,29 +3244,8 @@
       }
 
       var watch = getWatchlist();
-      var trades = getTrades();
-      var buys = trades.filter(function (t) { return t.side === 'buy'; }).length;
-      var sells = trades.filter(function (t) { return t.side === 'sell'; }).length;
-      // Approximate P&amp;L: sum(sell totals) - sum(buy totals)
-      var buySum = 0, sellSum = 0;
-      trades.forEach(function (t) {
-        var total = (Number(t.qty) || 0) * (Number(t.price) || 0);
-        if (t.side === 'buy') buySum += total;
-        else sellSum += total;
-      });
-      var pnl = sellSum - buySum;
-
       var elW = document.getElementById('stat-watch-count');
-      var elB = document.getElementById('stat-buy-count');
-      var elS = document.getElementById('stat-sell-count');
-      var elP = document.getElementById('stat-pnl');
       if (elW) elW.textContent = String(watch.length);
-      if (elB) elB.textContent = String(buys);
-      if (elS) elS.textContent = String(sells);
-      if (elP) {
-        elP.textContent = (pnl >= 0 ? '+' : '−') + fmtMoney(Math.abs(pnl)) + ' تومان';
-        elP.className = 'value ' + (pnl > 0 ? 'up' : (pnl < 0 ? 'down' : ''));
-      }
 
       var grid = document.getElementById('watch-grid');
       var empty = document.getElementById('watch-empty');
@@ -3370,41 +3277,8 @@
         }
       }
 
-      var tbody = document.getElementById('trades-tbody');
-      if (tbody) {
-        if (!trades.length) {
-          tbody.innerHTML = '<tr><td colspan="6" class="na-text"><span class="lang-fa">معامله‌ای ثبت نشده</span><span class="lang-en">No trades yet</span></td></tr>';
-        } else {
-          tbody.innerHTML = trades.slice().reverse().map(function (t) {
-            var total = (Number(t.qty) || 0) * (Number(t.price) || 0);
-            var sideFa = t.side === 'buy' ? 'خرید' : 'فروش';
-            var sideEn = t.side === 'buy' ? 'Buy' : 'Sell';
-            var cls = t.side === 'buy' ? 'up' : 'down';
-            var dt = t.at ? new Date(t.at).toLocaleString('fa-IR') : '—';
-            return '<tr><td>' + dt + '</td><td>' + (t.asset || '—') + '</td>' +
-              '<td class="' + cls + '"><span class="lang-fa">' + sideFa + '</span><span class="lang-en">' + sideEn + '</span></td>' +
-              '<td>' + t.qty + '</td><td>' + fmtMoney(t.price) + '</td><td>' + fmtMoney(total) + '</td></tr>';
-          }).join('');
-        }
-      }
     }
 
-    document.getElementById('trade-form') && document.getElementById('trade-form').addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (!window.FinverseAuth || !FinverseAuth.isLoggedIn()) return;
-      var asset = document.getElementById('tr-asset').value.trim();
-      var side = document.getElementById('tr-side').value;
-      var qty = parseFloat(document.getElementById('tr-qty').value);
-      var price = parseFloat(document.getElementById('tr-price').value);
-      var note = document.getElementById('tr-note').value.trim();
-      if (!asset || !(qty > 0) || !(price >= 0)) return;
-      var list = getTrades();
-      list.push({ asset: asset, side: side, qty: qty, price: price, note: note, at: new Date().toISOString() });
-      setTrades(list);
-      e.target.reset();
-      document.getElementById('tr-qty').value = '1';
-      renderUserPanel();
-    });
 
     document.getElementById('panel-add-sample') && document.getElementById('panel-add-sample').addEventListener('click', function () {
       var list = getWatchlist();

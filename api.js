@@ -7,11 +7,13 @@
 
   var TGJU_URL = 'https://call5.tgju.org/ajax.json';
   var HISTORY_URL = 'https://api.tgju.org/v1/market/indicator/summary-table-data/';
-  var CACHE_TTL_MS = 60000;
+  var CACHE_TTL_MS = 45000;
   var HISTORY_TTL_MS = 300000;
 
   var cache = { data: null, fetchedAt: 0 };
   var historyCache = {};
+  /** Deduplicate concurrent TGJU fetches */
+  var inflight = null;
 
   /** ISO → { nameFa, nameEn, country (ISO 3166-1 alpha-2 for flag) } */
   var CURRENCY_META = {
@@ -113,18 +115,29 @@
     if (!force && cache.data && now - cache.fetchedAt < CACHE_TTL_MS) {
       return Promise.resolve(cache.data);
     }
-    return fetch(TGJU_URL, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
+    if (!force && inflight) return inflight;
+
+    inflight = fetch(TGJU_URL, {
+      headers: { Accept: 'application/json', 'User-Agent': 'Finverse/1.0' },
       cache: 'no-store'
-    }).then(function (res) {
-      if (!res.ok) throw new Error('TGJU HTTP ' + res.status);
-      return res.json();
-    }).then(function (json) {
-      if (!json || typeof json.current !== 'object') throw new Error('TGJU: invalid payload');
-      cache = { data: json, fetchedAt: Date.now() };
-      return json;
-    });
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error('TGJU HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (json) {
+        if (!json || !json.current) throw new Error('Invalid TGJU payload');
+        cache.data = json;
+        cache.fetchedAt = Date.now();
+        inflight = null;
+        return json;
+      })
+      .catch(function (err) {
+        inflight = null;
+        throw err;
+      });
+
+    return inflight;
   }
 
   function shouldSkipKey(key) {
@@ -295,14 +308,24 @@
     add('crypto-bitcoin-irr', 'btc', { unit: 'تومان' });
     add('crypto-ethereum-irr', 'eth', { unit: 'تومان' });
     add('crypto-solana-irr', 'sol', { unit: 'تومان' });
+    add('crypto-dogecoin-irr', 'doge', { unit: 'تومان' });
+    add('crypto-cardano-irr', 'ada', { unit: 'تومان' });
+    add('crypto-ripple-irr', 'xrp', { unit: 'تومان' });
+    add('crypto-litecoin-irr', 'ltc', { unit: 'تومان' });
+    add('crypto-binance-coin-irr', 'bnb', { unit: 'تومان' });
+    add('crypto-tron-irr', 'trx', { unit: 'تومان' });
+    add('crypto-chainlink-irr', 'link', { unit: 'تومان' });
     add('usdt-irr', 'usdt', { unit: 'تومان' });
+    add('crypto-tether-irr', 'usdt2', { unit: 'تومان' });
     return { items: items, updatedAt: new Date().toISOString(), source: 'TGJU' };
   }
 
   function loadMarketData(options) {
     options = options || {};
     return fetchTgju(Boolean(options.force)).then(function (json) {
-      return buildSnapshot(json.current);
+      var snap = buildSnapshot(json.current);
+      snap.cryptos = extractCryptos(json.current);
+      return snap;
     });
   }
 
