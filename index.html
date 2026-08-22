@@ -181,6 +181,7 @@
 
     /* Price Cards */
     .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+    .price-card[data-view] { cursor: pointer; }
     .price-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; transition: all var(--transition); cursor: pointer; position: relative; display: block; }
     .price-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
     .price-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
@@ -360,7 +361,8 @@
       .search-dropdown { min-width: min(320px, calc(100vw - 24px)); left: auto; right: 0; }
       .footer-grid { grid-template-columns: 1fr; gap: 24px; }
       .market-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-      .price-card { padding: 14px; }
+      .price-card[data-view] { cursor: pointer; }
+    .price-card { padding: 14px; }
       .price-value { font-size: 1.15rem; }
       .status-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
       .change-desc { display: none; }
@@ -508,13 +510,20 @@
         <span class="lang-en">Finverse</span>
       </a>
       <nav class="nav" role="navigation">
-        <a data-view="gold" class="nav-gold"><span class="lang-fa">طلا و نقره</span><span class="lang-en">Gold & Silver</span></a>
+        <a data-view="gold" class="nav-gold"><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></a>
         <a data-view="forex" class="nav-forex"><span class="lang-fa">ارزها</span><span class="lang-en">Currencies</span></a>
         <a href="#"><span class="lang-fa">بورس</span><span class="lang-en">Stock</span></a>
         <a href="#"><span class="lang-fa">کریپتو</span><span class="lang-en">Crypto</span></a>
         <a href="#"><span class="lang-fa">کالاها</span><span class="lang-en">Commodities</span></a>
       </nav>
       <div class="header-actions">
+                <button class="icon-btn" id="account-btn" title="ایجاد حساب" aria-label="Create account">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M19 8v6M22 11h-6"/>
+          </svg>
+        </button>
         <button class="icon-btn lang-btn" id="lang-toggle">EN</button>
         <button class="icon-btn" id="theme-toggle">
           <svg id="theme-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -529,7 +538,7 @@
   <div class="mobile-nav" id="mobile-nav">
     <button class="icon-btn mobile-nav-close" id="mobile-nav-close"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     <a data-view="home"><span class="lang-fa">خانه</span><span class="lang-en">Home</span></a>
-    <a data-view="gold"><span class="lang-fa">طلا و نقره</span><span class="lang-en">Gold & Silver</span></a>
+    <a data-view="gold"><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></a>
     <a data-view="forex"><span class="lang-fa">ارزها</span><span class="lang-en">Currencies</span></a>
     <a href="#"><span class="lang-fa">بورس</span><span class="lang-en">Stock</span></a>
     <a href="#"><span class="lang-fa">کریپتو</span><span class="lang-en">Crypto</span></a>
@@ -572,39 +581,11 @@
             <strong id="dt-clock">—</strong>
           </div>
         </div>
-        
-        <article class="market-summary-box" id="market-summary">
-          <h2>
-            <span class="lang-fa">خلاصه وضعیت فعلی بازار</span>
-            <span class="lang-en">Current Market Summary</span>
-          </h2>
-          <p class="lang-fa">
-            در <span class="highlight">فاینورس</span> می‌توانید قیمت لحظه‌ای <span class="highlight">طلا، سکه، نقره و ارزهای اصلی</span>
-            را بر اساس داده‌های زنده منبع TGJU مشاهده کنید. نرخ دلار، یورو، پوند، درهم، لیر، ریال سعودی و سایر ارزها
-            به‌همراه طلای ۱۸ و ۲۴ عیار و انواع سکه به‌صورت دوره‌ای به‌روزرسانی می‌شود.
-          </p>
-          <p class="lang-en">
-            On <span class="highlight">Finverse</span> you can track live prices for
-            <span class="highlight">gold, coins, silver and major currencies</span> powered by TGJU.
-            USD, EUR, GBP, AED, TRY, SAR and more are refreshed periodically along with 18K/24K gold and Iranian coins.
-          </p>
-          <p class="lang-fa">
-            نمودارهای طلا و دلار از <span class="highlight">تاریخچه واقعی روزانه</span> تغذیه می‌شوند.
-            بخش‌هایی مانند شاخص بورس تهران و بخشی از رمزارزها فعلاً به API زنده وصل نیستند و با برچسب
-            «داده موجود نیست» مشخص شده‌اند تا با قیمت‌های واقعی اشتباه گرفته نشوند.
-          </p>
-          <p class="lang-en">
-            Gold and USD charts use <span class="highlight">real daily history</span>.
-            Sections such as Tehran stock index and some cryptocurrencies are not live yet and are marked
-            «Data unavailable» so they are not confused with real quotes.
-          </p>
-        </article>
-
-        <h2 class="section-title"><span class="lang-fa">وضعیت کلی بازار</span><span class="lang-en">Market Overview</span></h2>
+<h2 class="section-title"><span class="lang-fa">وضعیت کلی بازار</span><span class="lang-en">Market Overview</span></h2>
         <p class="section-subtitle"><span class="lang-fa">خلاصه عملکرد بازارهای اصلی</span><span class="lang-en">Summary of major markets</span></p>
         <div class="status-grid">
           <div class="status-card">
-            <div class="status-card-top"><span class="status-label"><span class="lang-fa">طلا و نقره</span><span class="lang-en">Gold & Silver</span></span><div class="status-icon" style="background:var(--accent-bg)"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div></div>
+            <div class="status-card-top"><span class="status-label"><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></span><div class="status-icon" style="background:var(--accent-bg)"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div></div>
             <div class="status-value"><span class="lang-fa">صعودی</span><span class="lang-en">Bullish</span></div>
             <div class="status-meta up"><span>▲ +۱.۱٪</span></div>
             <div class="status-bar"><div class="status-bar-fill up" style="width:72%"></div></div>
@@ -640,7 +621,7 @@
           <span class="lang-en">Last update: 15:30 | Sample source</span>
         </div>
         <div class="market-grid">
-          <div class="price-card" data-view="asset">
+          <div class="price-card" data-view="asset" data-asset="gold18">
             <div class="price-card-header">
               <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div><div><div class="asset-name"><span class="lang-fa">طلای ۱۸ عیار</span><span class="lang-en">18K Gold</span></div><div class="asset-symbol">Gold 18K</div></div></div>
               <button class="fav-btn active" onclick="event.stopPropagation()"><svg width="20" height="20" fill="currentColor" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
@@ -649,7 +630,7 @@
             <div class="price-change up"><span>+۱.۲۴٪</span></div>
             <div class="card-footer update-info"><span class="lang-fa">تومان / گرم</span><span class="lang-en">Toman / gram</span></div>
           </div>
-          <div class="price-card">
+          <div class="price-card" data-view="asset" data-asset="usd">
             <div class="price-card-header">
               <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M15 9.5c0-1.5-1.3-2.5-3-2.5S9 8 9 9.5 10.3 11 12 11s3 1 3 2.5-1.3 2.5-3 2.5-3-1-3-2.5"/></svg></div><div><div class="asset-name"><span class="lang-fa">دلار آمریکا</span><span class="lang-en">US Dollar</span></div><div class="asset-symbol">USD</div></div></div>
               <button class="fav-btn" onclick="event.stopPropagation()"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
@@ -658,7 +639,7 @@
             <div class="price-change down"><span>−۰.۳۸٪</span></div>
             <div class="card-footer update-info"><span class="lang-fa">تومان</span><span class="lang-en">Toman</span></div>
           </div>
-          <div class="price-card">
+          <div class="price-card" data-view="asset" data-asset="btc">
             <div class="price-card-header">
               <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 8h5a2.5 2.5 0 0 1 0 5H9zm0 5h5.5a2.5 2.5 0 0 1 0 5H9zM10 6v2M13 6v2M10 16v2M13 16v2"/></svg></div><div><div class="asset-name"><span class="lang-fa">بیت‌کوین</span><span class="lang-en">Bitcoin</span> <span class="data-na">داده موجود نیست</span></div><div class="asset-symbol">BTC</div></div></div>
               <button class="fav-btn active" onclick="event.stopPropagation()"><svg width="20" height="20" fill="currentColor" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
@@ -667,7 +648,7 @@
             <div class="price-change up"><span>+۲.۱۵٪</span></div>
             <div class="card-footer update-info"><span class="lang-fa">دلار</span><span class="lang-en">USD</span></div>
           </div>
-          <div class="price-card">
+          <div class="price-card" data-view="asset" data-asset="eur">
             <div class="price-card-header">
               <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6a8 8 0 1 0 0 12M6 10h8M6 14h8"/></svg></div><div><div class="asset-name"><span class="lang-fa">یورو</span><span class="lang-en">Euro</span></div><div class="asset-symbol">EUR</div></div></div>
               <button class="fav-btn" onclick="event.stopPropagation()"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
@@ -707,7 +688,7 @@
             <div class="gl-list">
               <div class="gl-item"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span> XRP</div><div class="gl-price">$۰.۶۱۸</div><div class="gl-change up">+۳.۴۲٪</div></div>
               <div class="gl-item" data-view="asset"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 8h5a2.5 2.5 0 0 1 0 5H9zm0 5h5.5a2.5 2.5 0 0 1 0 5H9zM10 6v2M13 6v2M10 16v2M13 16v2"/></svg></span> BTC</div><div class="gl-price">داده موجود نیست</div><div class="gl-change up">+۲.۱۵٪</div></div>
-              <div class="gl-item" data-view="asset"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></span> <span class="lang-fa">طلا ۱۸</span><span class="lang-en">18K Gold</span></div><div class="gl-price">۴,۱۲۵,۰۰۰</div><div class="gl-change up">+۱.۲۴٪</div></div>
+              <div class="gl-item" data-view="asset"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></span> <span class="lang-fa">طلا ۱۸</span><span class="lang-en">18K Gold</span></div><div class="gl-price">—</div><div class="gl-change">—</div></div>
             </div>
           </div>
           <div class="gl-card">
@@ -715,7 +696,7 @@
             <div class="gl-list">
               <div class="gl-item"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16l3-4 3 2 4-6"/></svg></span> <span class="lang-fa">فولاد</span><span class="lang-en">Foolad</span></div><div class="gl-price">۴,۲۸۵</div><div class="gl-change down">−۱.۰۴٪</div></div>
               <div class="gl-item"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span> SOL</div><div class="gl-price">$۱۴۸.۶</div><div class="gl-change down">−۰.۹۲٪</div></div>
-              <div class="gl-item" data-view="asset"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9"/></svg></span> <span class="lang-fa">نقره</span><span class="lang-en">Silver</span></div><div class="gl-price">۴۸,۹۰۰</div><div class="gl-change down">−۰.۸۵٪</div></div>
+              <div class="gl-item" data-view="asset"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9"/></svg></span> <span class="lang-fa">نقره</span><span class="lang-en">Silver</span></div><div class="gl-price">—</div><div class="gl-change">—</div></div>
             </div>
           </div>
         </div>
@@ -782,9 +763,9 @@
         <nav class="breadcrumb">
           <a data-view="home"><span class="lang-fa">خانه</span><span class="lang-en">Home</span></a>
           <span>/</span>
-          <span class="lang-fa">طلا و نقره</span><span class="lang-en">Gold & Silver</span>
+          <span class="lang-fa">فلزات</span><span class="lang-en">Metals</span>
         </nav>
-        <h1><span class="lang-fa">طلا و نقره</span><span class="lang-en">Gold & Silver</span></h1>
+        <h1><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></h1>
         <p><span class="lang-fa">قیمت لحظه‌ای طلا، سکه و نقره در بازار ایران</span><span class="lang-en">Real-time prices of gold, coins and silver in Iran</span></p>
       </div>
     </div>
@@ -793,7 +774,7 @@
       <div class="container">
         <h2 class="section-title"><span class="lang-fa">قیمت‌های مهم</span><span class="lang-en">Key Prices</span></h2>
         <div class="market-grid">
-          <div class="price-card" data-view="asset">
+          <div class="price-card" data-view="asset" data-asset="gold18">
             <div class="price-card-header"><div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div><div><div class="asset-name"><span class="lang-fa">طلای ۱۸ عیار</span><span class="lang-en">18K Gold</span></div><div class="asset-symbol">Gold 18K</div></div></div><span class="badge badge-up">▲</span></div>
             <div class="price-value">۴,۱۲۵,۰۰۰</div>
             <div class="price-change up">+۱.۲۴٪</div>
@@ -840,7 +821,7 @@
           <div class="gl-card">
             <div class="gl-header gainers"><span class="lang-fa">بیشترین رشد</span><span class="lang-en">Top Gainers</span></div>
             <div class="gl-list">
-              <div class="gl-item" data-view="asset"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></span> <span class="lang-fa">طلای ۱۸ عیار</span><span class="lang-en">18K Gold</span></div><div class="gl-price">۴,۱۲۵,۰۰۰</div><div class="gl-change up">+۱.۲۴٪</div></div>
+              <div class="gl-item" data-view="asset"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></span> <span class="lang-fa">طلای ۱۸ عیار</span><span class="lang-en">18K Gold</span></div><div class="gl-price">—</div><div class="gl-change">—</div></div>
               <div class="gl-item"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></span> <span class="lang-fa">طلای ۲۴ عیار</span><span class="lang-en">24K Gold</span></div><div class="gl-price">۵,۵۰۰,۰۰۰</div><div class="gl-change up">+۱.۲۴٪</div></div>
               <div class="gl-item"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/></svg></span> <span class="lang-fa">سکه امامی</span><span class="lang-en">Emami</span></div><div class="gl-price">۴۸,۲۵۰,۰۰۰</div><div class="gl-change up">+۰.۹۸٪</div></div>
             </div>
@@ -848,7 +829,7 @@
           <div class="gl-card">
             <div class="gl-header losers"><span class="lang-fa">بیشترین افت</span><span class="lang-en">Top Losers</span></div>
             <div class="gl-list">
-              <div class="gl-item" data-view="asset"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9"/></svg></span> <span class="lang-fa">نقره</span><span class="lang-en">Silver</span></div><div class="gl-price">۴۸,۹۰۰</div><div class="gl-change down">−۰.۸۵٪</div></div>
+              <div class="gl-item" data-view="asset"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9"/></svg></span> <span class="lang-fa">نقره</span><span class="lang-en">Silver</span></div><div class="gl-price">—</div><div class="gl-change">—</div></div>
               <div class="gl-item"><div class="gl-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/></svg></span> <span class="lang-fa">ربع‌سکه</span><span class="lang-en">Quarter</span></div><div class="gl-price">۱۵,۲۰۰,۰۰۰</div><div class="gl-change down">−۰.۴۲٪</div></div>
             </div>
           </div>
@@ -982,7 +963,7 @@
         <nav class="breadcrumb">
           <a data-view="home"><span class="lang-fa">خانه</span><span class="lang-en">Home</span></a>
           <span>/</span>
-          <a data-view="gold"><span class="lang-fa">طلا و نقره</span><span class="lang-en">Gold & Silver</span></a>
+          <a data-view="gold"><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></a>
           <span>/</span>
           <span class="lang-fa">طلای ۱۸ عیار</span><span class="lang-en">18K Gold</span>
         </nav>
@@ -1131,7 +1112,7 @@
         </div>
         <div class="filter-chips" id="search-filters">
           <button class="filter-chip active" data-filter="all"><span class="lang-fa">همه</span><span class="lang-en">All</span></button>
-          <button class="filter-chip" data-filter="gold"><span class="lang-fa">طلا و نقره</span><span class="lang-en">Gold & Silver</span></button>
+          <button class="filter-chip" data-filter="gold"><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></button>
           <button class="filter-chip" data-filter="forex"><span class="lang-fa">ارز</span><span class="lang-en">Forex</span></button>
           <button class="filter-chip" data-filter="stock"><span class="lang-fa">بورس</span><span class="lang-en">Stock</span></button>
           <button class="filter-chip" data-filter="crypto"><span class="lang-fa">کریپتو</span><span class="lang-en">Crypto</span></button>
@@ -1262,7 +1243,7 @@
         <div>
           <h4 class="lang-fa">دسته‌بندی‌ها</h4><h4 class="lang-en">Categories</h4>
           <div class="footer-links">
-            <a data-view="gold"><span class="lang-fa">طلا و نقره</span><span class="lang-en">Gold & Silver</span></a>
+            <a data-view="gold"><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></a>
             <a data-view="forex"><span class="lang-fa">ارزها</span><span class="lang-en">Currencies</span></a>
             <a href="#"><span class="lang-fa">بورس</span><span class="lang-en">Stock</span></a>
             <a href="#"><span class="lang-fa">رمزارزها</span><span class="lang-en">Crypto</span></a>
@@ -1351,16 +1332,108 @@
       }, 80);
     }
 
+    var __currentAssetId = 'gold18';
+    var ASSET_LABELS = {
+      gold18: { fa: 'طلای ۱۸ عیار', en: '18K Gold', symbol: 'XAU18', unit: 'تومان / گرم', hist: 'geram18' },
+      gold24: { fa: 'طلای ۲۴ عیار', en: '24K Gold', symbol: 'XAU24', unit: 'تومان / گرم', hist: 'geram24' },
+      emami: { fa: 'سکه امامی', en: 'Emami Coin', symbol: 'EMAMI', unit: 'تومان', hist: 'sekee' },
+      silver: { fa: 'نقره', en: 'Silver', symbol: 'XAG', unit: 'تومان / گرم', hist: 'silver_999' },
+      usd: { fa: 'دلار آمریکا', en: 'US Dollar', symbol: 'USD', unit: 'تومان', hist: 'price_dollar_rl' },
+      eur: { fa: 'یورو', en: 'Euro', symbol: 'EUR', unit: 'تومان', hist: 'price_eur' },
+      btc: { fa: 'بیت‌کوین', en: 'Bitcoin', symbol: 'BTC', unit: 'تومان', hist: 'crypto-bitcoin-irr' },
+      eth: { fa: 'اتریوم', en: 'Ethereum', symbol: 'ETH', unit: 'تومان', hist: 'crypto-ethereum-irr' }
+    };
+
+    function openAssetDetail(assetId) {
+      __currentAssetId = assetId || 'gold18';
+      showView('asset');
+      populateAssetDetail(__currentAssetId);
+    }
+
+    function populateAssetDetail(assetId) {
+      var meta = ASSET_LABELS[assetId] || { fa: assetId, en: assetId, symbol: assetId, unit: 'تومان', hist: assetId };
+      var lang = html.getAttribute('data-lang') || 'fa';
+      var nameEl = document.querySelector('#view-asset .asset-hero-top .asset-name, #view-asset h1, #view-asset .breadcrumb span:last-child');
+      // Update breadcrumb last crumb + titles
+      var crumbs = document.querySelectorAll('#view-asset .breadcrumb span');
+      if (crumbs.length) crumbs[crumbs.length - 1].textContent = lang === 'fa' ? meta.fa : meta.en;
+      var heroName = document.querySelector('#view-asset .asset-hero-name, #view-asset .asset-title');
+      // Prefer structured fields
+      var titleNodes = document.querySelectorAll('#view-asset .asset-hero-top div');
+      document.querySelectorAll('#view-asset .lang-fa').forEach(function(){});
+      // Fill price from MarketAPI items cache or fetch
+      function applyItem(item) {
+        var priceEl = document.querySelector('#view-asset .asset-price, #view-asset .price-value');
+        var changeEls = document.querySelectorAll('#view-asset .asset-change, #view-asset .price-change, #view-asset .stat-value.up, #view-asset .stat-value.down');
+        if (!item || item.priceFormatted == null) {
+          if (priceEl) priceEl.textContent = 'داده موجود نیست';
+          return;
+        }
+        if (priceEl) priceEl.textContent = item.priceFormatted;
+        var ch = item.changeFormatted || '—';
+        document.querySelectorAll('#view-asset .stat-item').forEach(function (row) {
+          var label = (row.textContent || '');
+          var val = row.querySelector('.stat-value');
+          if (!val) return;
+          if (label.indexOf('تغییر') !== -1 || label.indexOf('Today') !== -1) {
+            val.textContent = ch;
+            val.classList.toggle('up', !!item.isUp);
+            val.classList.toggle('down', !item.isUp);
+          }
+          if ((label.indexOf('بالاترین') !== -1 || label.indexOf('High') !== -1) && item.high != null) {
+            val.textContent = (window.MarketAPI && MarketAPI.formatToman) ? MarketAPI.formatToman(item.high) : item.high;
+          }
+          if ((label.indexOf('پایین‌ترین') !== -1 || label.indexOf('Low') !== -1) && item.low != null) {
+            val.textContent = (window.MarketAPI && MarketAPI.formatToman) ? MarketAPI.formatToman(item.low) : item.low;
+          }
+        });
+        // chart
+        if (window.MarketAPI && MarketAPI.fetchHistory) {
+          var key = meta.hist || assetId;
+          MarketAPI.fetchHistory(key, 30).then(function (closes) {
+            if (closes && closes.length > 2 && typeof drawMainChart === 'function') {
+              window.__histGold = { '1d': closes.slice(-7), '1w': closes.slice(-14), '1m': closes, '1y': closes };
+              drawMainChart(closes.slice(-14));
+            }
+          });
+        }
+      }
+      if (window.MarketAPI) {
+        MarketAPI.loadMarketData().then(function (snap) {
+          var item = snap.items[assetId];
+          if (!item && assetId === 'btc') {
+            return MarketAPI.loadCryptos().then(function (r) {
+              var c = (r.cryptos || []).find(function (x) { return x.id === 'btc'; });
+              applyItem(c);
+            });
+          }
+          applyItem(item);
+        }).catch(function () { applyItem(null); });
+      }
+      // Update visible name texts in hero
+      var heroFa = document.querySelector('#view-asset .asset-hero-top .lang-fa');
+      var heroEn = document.querySelector('#view-asset .asset-hero-top .lang-en');
+      // fallback: set any h1-like
+      var h1 = document.querySelector('#view-asset h1');
+      if (h1) {
+        h1.innerHTML = '<span class="lang-fa">' + meta.fa + '</span><span class="lang-en">' + meta.en + '</span>';
+      }
+    }
+
     document.querySelectorAll('[data-view]').forEach(el => {
       el.addEventListener('click', (e) => {
+        if (e.target.closest && e.target.closest('.fav-btn')) return;
         e.preventDefault();
         const view = el.getAttribute('data-view');
-        if (view) {
+        const assetId = el.getAttribute('data-asset');
+        if (view === 'asset') {
+          openAssetDetail(assetId || 'gold18');
+        } else if (view) {
           showView(view);
-          if (mobileNav.classList.contains('open')) {
-            mobileNav.classList.remove('open');
-            setTimeout(() => mobileNav.style.display = 'none', 300);
-          }
+        }
+        if (mobileNav.classList.contains('open')) {
+          mobileNav.classList.remove('open');
+          setTimeout(() => mobileNav.style.display = 'none', 300);
         }
       });
     });
@@ -1549,7 +1622,7 @@
     ];
 
     const CAT_LABELS = {
-      gold: { fa: 'طلا و نقره', en: 'Gold & Silver' },
+      gold: { fa: 'فلزات', en: 'Metals' },
       forex: { fa: 'ارز', en: 'Forex' },
       stock: { fa: 'بورس', en: 'Stock' },
       crypto: { fa: 'کریپتو', en: 'Crypto' },

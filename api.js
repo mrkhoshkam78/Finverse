@@ -292,6 +292,10 @@
     add('ons', 'ounce', { unit: 'USD', currency: 'USD' });
     add('copper', 'copper', { unit: 'USD / ton', currency: 'USD' });
     add('base_global_zinc', 'zinc', { unit: 'USD / ton', currency: 'USD' });
+    add('crypto-bitcoin-irr', 'btc', { unit: 'تومان' });
+    add('crypto-ethereum-irr', 'eth', { unit: 'تومان' });
+    add('crypto-solana-irr', 'sol', { unit: 'تومان' });
+    add('usdt-irr', 'usdt', { unit: 'تومان' });
     return { items: items, updatedAt: new Date().toISOString(), source: 'TGJU' };
   }
 
@@ -370,7 +374,7 @@
     var ID_MAP = {
       usd: 'price_dollar_rl', eur: 'price_eur', gbp: 'price_gbp',
       aed: 'price_aed', try: 'price_try', sar: 'price_sar',
-      gold18: 'geram18', gold24: 'geram24', emami: 'sekee', silver: 'silver_999', ounce: 'ons'
+      gold18: 'geram18', gold24: 'geram24', emami: 'sekee', silver: 'silver_999', ounce: 'ons', btc: 'crypto-bitcoin-irr', eth: 'crypto-ethereum-irr'
     };
     if (ID_MAP[key]) key = ID_MAP[key];
     if (!key) return Promise.resolve([]);
@@ -410,9 +414,104 @@
     historyCache = {};
   }
 
+
+  var CRYPTO_META = {
+    'crypto-bitcoin-irr': { id: 'btc', iso: 'BTC', nameFa: 'بیت‌کوین', nameEn: 'Bitcoin' },
+    'crypto-ethereum-irr': { id: 'eth', iso: 'ETH', nameFa: 'اتریوم', nameEn: 'Ethereum' },
+    'crypto-solana-irr': { id: 'sol', iso: 'SOL', nameFa: 'سولانا', nameEn: 'Solana' },
+    'crypto-dogecoin-irr': { id: 'doge', iso: 'DOGE', nameFa: 'دوج‌کوین', nameEn: 'Dogecoin' },
+    'crypto-cardano-irr': { id: 'ada', iso: 'ADA', nameFa: 'کاردانو', nameEn: 'Cardano' },
+    'crypto-ripple-irr': { id: 'xrp', iso: 'XRP', nameFa: 'ریپل', nameEn: 'Ripple' },
+    'crypto-litecoin-irr': { id: 'ltc', iso: 'LTC', nameFa: 'لایت‌کوین', nameEn: 'Litecoin' },
+    'crypto-binance-coin-irr': { id: 'bnb', iso: 'BNB', nameFa: 'بایننس کوین', nameEn: 'BNB' },
+    'crypto-tron-irr': { id: 'trx', iso: 'TRX', nameFa: 'ترون', nameEn: 'Tron' },
+    'crypto-chainlink-irr': { id: 'link', iso: 'LINK', nameFa: 'چین‌لینک', nameEn: 'Chainlink' },
+    'crypto-polkadot-irr': { id: 'dot', iso: 'DOT', nameFa: 'پولکادات', nameEn: 'Polkadot' },
+    'crypto-avalanche-irr': { id: 'avax', iso: 'AVAX', nameFa: 'آوالانچ', nameEn: 'Avalanche' },
+    'usdt-irr': { id: 'usdt', iso: 'USDT', nameFa: 'تتر', nameEn: 'Tether' },
+    'crypto-tether-irr': { id: 'usdt', iso: 'USDT', nameFa: 'تتر', nameEn: 'Tether' }
+  };
+
+  function extractCryptos(current) {
+    var list = [];
+    var seen = {};
+    Object.keys(CRYPTO_META).forEach(function (key) {
+      var raw = current[key];
+      if (!raw || raw.p == null) return;
+      var meta = CRYPTO_META[key];
+      if (seen[meta.id]) return;
+      seen[meta.id] = true;
+      var priceRial = parsePrice(raw.p);
+      var price = priceRial != null ? toToman(priceRial) : null;
+      var changePct = raw.dp != null ? Number(raw.dp) : null;
+      list.push({
+        id: meta.id,
+        iso: meta.iso,
+        tgjuKey: key,
+        nameFa: meta.nameFa,
+        nameEn: meta.nameEn,
+        price: price,
+        priceFormatted: price != null ? formatToman(price) : null,
+        high: raw.h != null ? toToman(parsePrice(raw.h)) : null,
+        low: raw.l != null ? toToman(parsePrice(raw.l)) : null,
+        changePercent: changePct,
+        changeFormatted: changePct != null ? ((changePct >= 0 ? '+' : '') + changePct.toFixed(2) + '%') : null,
+        isUp: changePct != null ? changePct >= 0 : null,
+        time: raw.t || null,
+        unit: 'تومان',
+        source: 'TGJU',
+        available: price != null,
+        category: 'crypto'
+      });
+    });
+    // also auto-discover other crypto-*-irr
+    Object.keys(current).forEach(function (key) {
+      if (!key.startsWith('crypto-') || !key.endsWith('-irr')) return;
+      if (CRYPTO_META[key]) return;
+      var raw = current[key];
+      if (!raw || raw.p == null) return;
+      var slug = key.replace('crypto-', '').replace('-irr', '');
+      var id = slug.replace(/-/g, '_');
+      if (seen[id]) return;
+      seen[id] = true;
+      var priceRial = parsePrice(raw.p);
+      var price = priceRial != null ? toToman(priceRial) : null;
+      var changePct = raw.dp != null ? Number(raw.dp) : null;
+      list.push({
+        id: id,
+        iso: slug.slice(0, 6).toUpperCase(),
+        tgjuKey: key,
+        nameFa: slug,
+        nameEn: slug,
+        price: price,
+        priceFormatted: price != null ? formatToman(price) : null,
+        changePercent: changePct,
+        changeFormatted: changePct != null ? ((changePct >= 0 ? '+' : '') + changePct.toFixed(2) + '%') : null,
+        isUp: changePct != null ? changePct >= 0 : null,
+        time: raw.t || null,
+        unit: 'تومان',
+        source: 'TGJU',
+        available: price != null,
+        category: 'crypto'
+      });
+    });
+    return list;
+  }
+
+  function loadCryptos(options) {
+    options = options || {};
+    return fetchTgju(Boolean(options.force)).then(function (json) {
+      var list = extractCryptos(json.current);
+      return { cryptos: list, count: list.length, updatedAt: new Date().toISOString(), status: 'ok', error: null, source: 'TGJU' };
+    }).catch(function (err) {
+      return { cryptos: [], count: 0, updatedAt: null, status: 'error', error: String(err.message || err), source: 'TGJU' };
+    });
+  }
+
   global.MarketAPI = {
     loadMarketData: loadMarketData,
     loadCurrencies: loadCurrencies,
+    loadCryptos: loadCryptos,
     convert: convert,
     fetchHistory: fetchHistory,
     clearCache: clearCache,
