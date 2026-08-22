@@ -519,6 +519,125 @@
     .ta-summary span { white-space: nowrap; }
     .ta-summary .up { color: var(--up); }
     .ta-summary .down { color: var(--down); }
+
+    /* Modern nav + mobile drawer */
+    .nav { display: flex; align-items: center; gap: 2px; }
+    .nav a {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 999px; font-size: 0.875rem; font-weight: 600;
+      color: var(--text-secondary); transition: color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+    }
+    .nav a svg { width: 16px; height: 16px; opacity: 0.85; flex-shrink: 0; }
+    .nav a:hover { color: var(--text); background: var(--bg-hover); }
+    .nav a.active {
+      color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent);
+    }
+    .nav a:active { transform: scale(0.97); }
+
+    .mobile-nav {
+      display: flex; position: fixed; inset: 0; z-index: 200;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(10px);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.22s ease, visibility 0.22s ease;
+    }
+    .mobile-nav.open { opacity: 1; visibility: visible; pointer-events: auto; }
+    .mobile-nav-panel {
+      margin-inline-start: auto; width: min(320px, 88vw); height: 100%;
+      background: var(--bg-card); border-inline-start: 1px solid var(--border);
+      box-shadow: var(--shadow); padding: 20px 16px;
+      display: flex; flex-direction: column; gap: 6px;
+      transform: translateX(100%);
+      transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    [dir="rtl"] .mobile-nav-panel { transform: translateX(-100%); }
+    .mobile-nav.open .mobile-nav-panel { transform: translateX(0); }
+    .mobile-nav-close {
+      align-self: flex-end; margin-bottom: 12px;
+    }
+    .mobile-nav a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border-radius: 12px; font-weight: 600;
+      color: var(--text); background: transparent; border: 1px solid transparent;
+      transition: background 0.18s ease, border-color 0.18s ease;
+      min-height: 48px;
+    }
+    .mobile-nav a svg { width: 18px; height: 18px; color: var(--text-secondary); }
+    .mobile-nav a:hover, .mobile-nav a.active {
+      background: var(--bg-hover); border-color: var(--border);
+    }
+    .mobile-nav a.active { color: var(--primary); }
+    .mobile-nav a.active svg { color: var(--primary); }
+
+    .user-menu { position: relative; }
+    .user-menu-dropdown {
+      position: absolute; top: calc(100% + 8px); inset-inline-end: 0;
+      min-width: 220px; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 8px;
+      opacity: 0; visibility: hidden; transform: translateY(-6px);
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+      z-index: 160;
+    }
+    .user-menu.open .user-menu-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .user-menu-dropdown button, .user-menu-dropdown .user-email {
+      display: block; width: 100%; text-align: start; padding: 10px 12px;
+      border-radius: 8px; font-size: 0.9rem; color: var(--text);
+      background: transparent; border: none; cursor: pointer;
+    }
+    .user-menu-dropdown button:hover { background: var(--bg-hover); }
+    .user-email { color: var(--text-muted); font-size: 0.8rem; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+
+    /* auth-modal */
+    .auth-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center; padding: 16px;
+      opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s;
+    }
+    .auth-overlay.open { opacity: 1; visibility: visible; }
+    .auth-modal {
+      width: min(420px, 100%); background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 28px 24px;
+      transform: translateY(10px); transition: transform 0.22s ease;
+    }
+    .auth-overlay.open .auth-modal { transform: translateY(0); }
+    .auth-modal h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 6px; }
+    .auth-modal .auth-sub { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; }
+    .auth-tabs { display: flex; gap: 6px; margin-bottom: 18px; background: var(--bg-hover); padding: 4px; border-radius: 999px; }
+    .auth-tabs button {
+      flex: 1; padding: 10px; border-radius: 999px; border: none; background: transparent;
+      color: var(--text-secondary); font-weight: 700; cursor: pointer;
+    }
+    .auth-tabs button.active { background: var(--bg-card); color: var(--text); box-shadow: var(--shadow-sm); }
+    .auth-field { margin-bottom: 14px; }
+    .auth-field label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+    .auth-field input {
+      width: 100%; padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--border);
+      background: var(--input-bg); color: var(--text); font-size: 0.95rem;
+    }
+    .auth-field input:focus { outline: none; border-color: var(--primary); }
+    .auth-error {
+      background: var(--down-bg); color: var(--down); border: 1px solid color-mix(in srgb, var(--down) 30%, transparent);
+      padding: 10px 12px; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 12px; display: none;
+    }
+    .auth-error.show { display: block; }
+    .auth-success {
+      background: var(--up-bg); color: var(--up); padding: 10px 12px; border-radius: var(--radius-sm);
+      font-size: 0.85rem; margin-bottom: 12px; display: none;
+    }
+    .auth-success.show { display: block; }
+    .auth-submit {
+      width: 100%; padding: 12px; border: none; border-radius: var(--radius); font-weight: 700;
+      background: var(--primary); color: #fff; cursor: pointer; margin-top: 4px;
+    }
+    .auth-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+    .auth-close {
+      position: absolute; top: 12px; inset-inline-end: 12px;
+      width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg-hover);
+      color: var(--text-secondary); cursor: pointer; display: grid; place-items: center;
+    }
+    .auth-modal-wrap { position: relative; }
   </style>
 </head>
 <body>
@@ -530,21 +649,36 @@
         <span class="lang-fa">فاینورس</span>
         <span class="lang-en">Finverse</span>
       </a>
-      <nav class="nav" role="navigation">
-        <a data-view="gold" class="nav-gold"><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></a>
-        <a data-view="forex" class="nav-forex"><span class="lang-fa">ارزها</span><span class="lang-en">Currencies</span></a>
-        <a href="#"><span class="lang-fa">بورس</span><span class="lang-en">Stock</span></a>
-        <a href="#"><span class="lang-fa">کریپتو</span><span class="lang-en">Crypto</span></a>
-        <a href="#"><span class="lang-fa">کالاها</span><span class="lang-en">Commodities</span></a>
+      <nav class="nav" aria-label="Main">
+        <a data-view="home" class="nav-home active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg>
+          <span class="lang-fa">خانه</span><span class="lang-en">Home</span>
+        </a>
+        <a data-view="gold" class="nav-gold">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>
+          <span class="lang-fa">فلزات</span><span class="lang-en">Metals</span>
+        </a>
+        <a data-view="forex" class="nav-forex">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+          <span class="lang-fa">ارزها</span><span class="lang-en">Currencies</span>
+        </a>
       </nav>
       <div class="header-actions">
-                <button class="icon-btn" id="account-btn" title="ایجاد حساب" aria-label="Create account">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M19 8v6M22 11h-6"/>
-          </svg>
-        </button>
+                <div class="user-menu" id="user-menu">
+          <button class="icon-btn" id="account-btn" title="حساب کاربری" aria-label="Account" aria-haspopup="true" aria-expanded="false">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M19 8v6M22 11h-6"/>
+            </svg>
+          </button>
+          <div class="user-menu-dropdown" id="user-menu-dropdown" role="menu">
+            <div class="user-email" id="user-menu-email" hidden>—</div>
+            <button type="button" id="btn-open-login" role="menuitem"><span class="lang-fa">ورود</span><span class="lang-en">Login</span></button>
+            <button type="button" id="btn-open-register" role="menuitem"><span class="lang-fa">ثبت‌نام</span><span class="lang-en">Register</span></button>
+            <button type="button" id="btn-logout" role="menuitem" hidden><span class="lang-fa">خروج</span><span class="lang-en">Logout</span></button>
+          </div>
+        </div>
         <button class="icon-btn lang-btn" id="lang-toggle">EN</button>
         <button class="icon-btn" id="theme-toggle">
           <svg id="theme-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -556,13 +690,28 @@
     </div>
   </header>
 
-  <div class="mobile-nav" id="mobile-nav">
-    <button class="icon-btn mobile-nav-close" id="mobile-nav-close"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    <a data-view="home"><span class="lang-fa">خانه</span><span class="lang-en">Home</span></a>
-    <a data-view="gold"><span class="lang-fa">فلزات</span><span class="lang-en">Metals</span></a>
-    <a data-view="forex"><span class="lang-fa">ارزها</span><span class="lang-en">Currencies</span></a>
-    <a href="#"><span class="lang-fa">بورس</span><span class="lang-en">Stock</span></a>
-    <a href="#"><span class="lang-fa">کریپتو</span><span class="lang-en">Crypto</span></a>
+  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+    <div class="mobile-nav-panel">
+      <button class="icon-btn mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <a data-view="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg>
+        <span class="lang-fa">خانه</span><span class="lang-en">Home</span>
+      </a>
+      <a data-view="gold">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>
+        <span class="lang-fa">فلزات</span><span class="lang-en">Metals</span>
+      </a>
+      <a data-view="forex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+        <span class="lang-fa">ارزها</span><span class="lang-en">Currencies</span>
+      </a>
+      <a href="#" id="mobile-auth-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+        <span class="lang-fa">حساب کاربری</span><span class="lang-en">Account</span>
+      </a>
+    </div>
   </div>
 
   <!-- ==================== VIEW: HOME ==================== -->
@@ -1295,6 +1444,44 @@
     </div>
   </footer>
 
+
+  <div class="auth-overlay" id="auth-overlay" aria-hidden="true">
+    <div class="auth-modal-wrap">
+      <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <button type="button" class="auth-close" id="auth-close" aria-label="Close">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <h2 id="auth-title"><span class="lang-fa">حساب فاینورس</span><span class="lang-en">Finverse Account</span></h2>
+        <p class="auth-sub"><span class="lang-fa">ورود یا ثبت‌نام برای ذخیره علاقه‌مندی‌ها</span><span class="lang-en">Sign in to sync your preferences</span></p>
+        <div class="auth-tabs">
+          <button type="button" class="active" data-auth-tab="login"><span class="lang-fa">ورود</span><span class="lang-en">Login</span></button>
+          <button type="button" data-auth-tab="register"><span class="lang-fa">ثبت‌نام</span><span class="lang-en">Register</span></button>
+        </div>
+        <div class="auth-error" id="auth-error"></div>
+        <div class="auth-success" id="auth-success"></div>
+        <form id="auth-form" novalidate>
+          <div class="auth-field" id="auth-name-field" hidden>
+            <label for="auth-name"><span class="lang-fa">نام نمایشی</span><span class="lang-en">Display name</span></label>
+            <input id="auth-name" name="name" type="text" autocomplete="name" maxlength="60">
+          </div>
+          <div class="auth-field">
+            <label for="auth-email"><span class="lang-fa">ایمیل</span><span class="lang-en">Email</span></label>
+            <input id="auth-email" name="email" type="email" required autocomplete="email" inputmode="email">
+          </div>
+          <div class="auth-field">
+            <label for="auth-password"><span class="lang-fa">رمز عبور</span><span class="lang-en">Password</span></label>
+            <input id="auth-password" name="password" type="password" required minlength="6" autocomplete="current-password">
+          </div>
+          <button type="submit" class="auth-submit" id="auth-submit">
+            <span class="lang-fa">ادامه</span><span class="lang-en">Continue</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-auth.js"></script>
   <script src="api.js" onerror="console.error('api.js failed to load — place api.js next to this HTML file')"></script>
   <script>
     const html = document.documentElement;
@@ -1324,8 +1511,19 @@
 
     // ===== Mobile Menu =====
     const mobileNav = document.getElementById('mobile-nav');
-    document.getElementById('mobile-menu-btn').addEventListener('click', () => { mobileNav.classList.add('open'); mobileNav.style.display = 'flex'; });
-    document.getElementById('mobile-nav-close').addEventListener('click', () => { mobileNav.classList.remove('open'); setTimeout(() => mobileNav.style.display = 'none', 300); });
+    function openMobileNav() {
+      mobileNav.classList.add('open');
+      mobileNav.setAttribute('aria-hidden', 'false');
+    }
+    function closeMobileNav() {
+      mobileNav.classList.remove('open');
+      mobileNav.setAttribute('aria-hidden', 'true');
+    }
+    document.getElementById('mobile-menu-btn').addEventListener('click', openMobileNav);
+    document.getElementById('mobile-nav-close').addEventListener('click', closeMobileNav);
+    mobileNav.addEventListener('click', function (e) {
+      if (e.target === mobileNav) closeMobileNav();
+    });
 
     // ===== View Router =====
     function showView(name) {
@@ -1595,7 +1793,17 @@
       };
     }
 
+    var __chartRaf = 0;
+    var __chartData = null;
     function drawMainChart(data) {
+      if (data) __chartData = data;
+      if (__chartRaf) cancelAnimationFrame(__chartRaf);
+      __chartRaf = requestAnimationFrame(function () {
+        __chartRaf = 0;
+        drawMainChartNow(__chartData);
+      });
+    }
+    function drawMainChartNow(data) {
       const canvas = document.getElementById('main-chart');
       if (!canvas || !data || data.length < 2) return;
       const analysis = analyzeSeries(data);
@@ -2570,6 +2778,142 @@
     setInterval(function () {
       if (!document.hidden) refreshLivePrices(false);
     }, 90000);
+
+
+    // ===== Auth UI (Supabase) =====
+    (function setupAuthUI() {
+      var overlay = document.getElementById('auth-overlay');
+      var form = document.getElementById('auth-form');
+      var errEl = document.getElementById('auth-error');
+      var okEl = document.getElementById('auth-success');
+      var nameField = document.getElementById('auth-name-field');
+      var submitBtn = document.getElementById('auth-submit');
+      var mode = 'login';
+      var userMenu = document.getElementById('user-menu');
+      var accountBtn = document.getElementById('account-btn');
+
+      function setMode(m) {
+        mode = m;
+        document.querySelectorAll('[data-auth-tab]').forEach(function (b) {
+          b.classList.toggle('active', b.getAttribute('data-auth-tab') === m);
+        });
+        nameField.hidden = m !== 'register';
+        document.getElementById('auth-password').autocomplete = m === 'login' ? 'current-password' : 'new-password';
+        errEl.classList.remove('show');
+        okEl.classList.remove('show');
+      }
+
+      function openAuth(m) {
+        setMode(m || 'login');
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+        setTimeout(function () { document.getElementById('auth-email').focus(); }, 50);
+      }
+      function closeAuth() {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+
+      document.querySelectorAll('[data-auth-tab]').forEach(function (b) {
+        b.addEventListener('click', function () { setMode(b.getAttribute('data-auth-tab')); });
+      });
+      document.getElementById('auth-close').addEventListener('click', closeAuth);
+      overlay.addEventListener('click', function (e) { if (e.target === overlay) closeAuth(); });
+      document.getElementById('btn-open-login').addEventListener('click', function () { userMenu.classList.remove('open'); openAuth('login'); });
+      document.getElementById('btn-open-register').addEventListener('click', function () { userMenu.classList.remove('open'); openAuth('register'); });
+      var mobAuth = document.getElementById('mobile-auth-link');
+      if (mobAuth) mobAuth.addEventListener('click', function (e) { e.preventDefault(); closeMobileNav(); openAuth('login'); });
+
+      accountBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        userMenu.classList.toggle('open');
+        accountBtn.setAttribute('aria-expanded', userMenu.classList.contains('open') ? 'true' : 'false');
+      });
+      document.addEventListener('click', function (e) {
+        if (!userMenu.contains(e.target)) userMenu.classList.remove('open');
+      });
+
+      document.getElementById('btn-logout').addEventListener('click', function () {
+        if (window.FinverseAuth) FinverseAuth.signOut();
+        userMenu.classList.remove('open');
+      });
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        errEl.classList.remove('show');
+        okEl.classList.remove('show');
+        var email = document.getElementById('auth-email').value.trim();
+        var password = document.getElementById('auth-password').value;
+        var name = document.getElementById('auth-name').value.trim();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          errEl.textContent = 'ایمیل معتبر وارد کنید';
+          errEl.classList.add('show');
+          return;
+        }
+        if (!password || password.length < 6) {
+          errEl.textContent = 'رمز عبور حداقل ۶ کاراکتر باشد';
+          errEl.classList.add('show');
+          return;
+        }
+        if (!window.FinverseAuth) {
+          errEl.textContent = 'سرویس احراز هویت در دسترس نیست';
+          errEl.classList.add('show');
+          return;
+        }
+        submitBtn.disabled = true;
+        var res = mode === 'register'
+          ? await FinverseAuth.signUp(email, password, name)
+          : await FinverseAuth.signIn(email, password);
+        submitBtn.disabled = false;
+        if (!res.ok) {
+          errEl.textContent = res.error || 'خطا';
+          errEl.classList.add('show');
+          return;
+        }
+        if (res.needsEmailConfirm) {
+          okEl.textContent = 'ثبت‌نام انجام شد. در صورت فعال بودن تأیید ایمیل، صندوق ورودی را بررسی کنید.';
+          okEl.classList.add('show');
+        } else {
+          closeAuth();
+        }
+      });
+
+      function renderAuth(state) {
+        var emailEl = document.getElementById('user-menu-email');
+        var btnLogin = document.getElementById('btn-open-login');
+        var btnReg = document.getElementById('btn-open-register');
+        var btnOut = document.getElementById('btn-logout');
+        if (state.user) {
+          emailEl.hidden = false;
+          emailEl.textContent = state.user.email || (state.profile && state.profile.display_name) || 'User';
+          btnLogin.hidden = true;
+          btnReg.hidden = true;
+          btnOut.hidden = false;
+          if (mobAuth) {
+            mobAuth.querySelector('.lang-fa').textContent = 'خروج';
+            mobAuth.querySelector('.lang-en').textContent = 'Logout';
+            mobAuth.onclick = function (e) { e.preventDefault(); FinverseAuth.signOut(); closeMobileNav(); };
+          }
+        } else {
+          emailEl.hidden = true;
+          btnLogin.hidden = false;
+          btnReg.hidden = false;
+          btnOut.hidden = true;
+          if (mobAuth) {
+            mobAuth.querySelector('.lang-fa').textContent = 'حساب کاربری';
+            mobAuth.querySelector('.lang-en').textContent = 'Account';
+            mobAuth.onclick = function (e) { e.preventDefault(); closeMobileNav(); openAuth('login'); };
+          }
+        }
+      }
+
+      if (window.FinverseAuth) {
+        FinverseAuth.onAuthChange(renderAuth);
+        FinverseAuth.init();
+      } else {
+        console.warn('FinverseAuth missing');
+      }
+    })();
 
     // Deep-link: #forex / #gold
     (function () {
