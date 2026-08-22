@@ -498,6 +498,27 @@
       position: absolute; top: calc(100% + 6px); left: 0; right: 0;
       min-width: 100%; z-index: 120;
     }
+
+    /* minimal nav */
+    .nav { gap: 4px; }
+    .nav a {
+      padding: 8px 14px; border-radius: 999px; font-size: 0.9rem; font-weight: 600;
+      color: var(--text-secondary); transition: all 0.2s;
+    }
+    .nav a:hover { color: var(--text); background: var(--bg-hover); }
+    .nav a.active { color: var(--primary); background: var(--bg-hover); }
+    .header { backdrop-filter: blur(12px); }
+    .header-inner { gap: 16px; }
+
+    .ta-summary {
+      display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 12px;
+      padding: 12px 14px; border-radius: var(--radius);
+      background: var(--bg-hover); border: 1px solid var(--border);
+      font-size: 0.82rem; color: var(--text-secondary);
+    }
+    .ta-summary span { white-space: nowrap; }
+    .ta-summary .up { color: var(--up); }
+    .ta-summary .down { color: var(--down); }
   </style>
 </head>
 <body>
@@ -641,12 +662,12 @@
           </div>
           <div class="price-card" data-view="asset" data-asset="btc">
             <div class="price-card-header">
-              <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 8h5a2.5 2.5 0 0 1 0 5H9zm0 5h5.5a2.5 2.5 0 0 1 0 5H9zM10 6v2M13 6v2M10 16v2M13 16v2"/></svg></div><div><div class="asset-name"><span class="lang-fa">بیت‌کوین</span><span class="lang-en">Bitcoin</span> <span class="data-na">داده موجود نیست</span></div><div class="asset-symbol">BTC</div></div></div>
+              <div class="asset-info"><div class="asset-icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 8h5a2.5 2.5 0 0 1 0 5H9zm0 5h5.5a2.5 2.5 0 0 1 0 5H9zM10 6v2M13 6v2M10 16v2M13 16v2"/></svg></div><div><div class="asset-name"><span class="lang-fa">بیت‌کوین</span><span class="lang-en">Bitcoin</span></div><div class="asset-symbol">BTC</div></div></div>
               <button class="fav-btn active" onclick="event.stopPropagation()"><svg width="20" height="20" fill="currentColor" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
             </div>
-            <div class="price-value">داده موجود نیست</div>
-            <div class="price-change up"><span>+۲.۱۵٪</span></div>
-            <div class="card-footer update-info"><span class="lang-fa">دلار</span><span class="lang-en">USD</span></div>
+            <div class="price-value">—</div>
+            <div class="price-change"><span>—</span></div>
+            <div class="card-footer update-info"><span class="lang-fa">تومان</span><span class="lang-en">Toman</span></div>
           </div>
           <div class="price-card" data-view="asset" data-asset="eur">
             <div class="price-card-header">
@@ -1006,6 +1027,7 @@
               </div>
             </div>
             <div class="main-chart-area"><canvas id="main-chart" width="800" height="320"></canvas></div>
+            <div id="ta-summary" class="ta-summary" aria-live="polite"></div>
           </div>
           <aside class="stats-card">
             <div class="stat-item"><span class="stat-label"><span class="lang-fa">تغییر امروز</span><span class="lang-en">Today</span></span><span class="stat-value up">+۵۰,۸۰۰ (+۱.۲۴٪)</span></div>
@@ -1539,99 +1561,180 @@
       '1y': [3200000,3350000,3500000,3400000,3600000,3750000,3700000,3850000,3900000,4000000,4050000,4125000]
     };
 
+        function sma(data, period) {
+      var out = [];
+      for (var i = 0; i < data.length; i++) {
+        if (i < period - 1) { out.push(null); continue; }
+        var sum = 0;
+        for (var j = 0; j < period; j++) sum += data[i - j];
+        out.push(sum / period);
+      }
+      return out;
+    }
+
+    function analyzeSeries(data) {
+      if (!data || data.length < 2) return null;
+      var last = data[data.length - 1];
+      var first = data[0];
+      var hi = Math.max.apply(null, data);
+      var lo = Math.min.apply(null, data);
+      var changePct = first ? ((last - first) / first) * 100 : 0;
+      var ma7 = sma(data, Math.min(7, data.length));
+      var ma20 = sma(data, Math.min(20, data.length));
+      var ma7v = ma7[ma7.length - 1];
+      var ma20v = ma20[ma20.length - 1];
+      var trend = 'neutral';
+      if (ma7v != null && ma20v != null) {
+        if (last > ma7v && ma7v > ma20v) trend = 'bullish';
+        else if (last < ma7v && ma7v < ma20v) trend = 'bearish';
+      } else if (changePct > 1) trend = 'bullish';
+      else if (changePct < -1) trend = 'bearish';
+      return {
+        last: last, high: hi, low: lo, changePct: changePct,
+        ma7: ma7, ma20: ma20, ma7v: ma7v, ma20v: ma20v, trend: trend
+      };
+    }
+
     function drawMainChart(data) {
       const canvas = document.getElementById('main-chart');
-      if (!canvas) return;
+      if (!canvas || !data || data.length < 2) return;
+      const analysis = analyzeSeries(data);
       const ctx = canvas.getContext('2d');
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.parentElement.getBoundingClientRect();
       if (rect.width < 10) return;
-      canvas.width = rect.width * dpr;
-      canvas.height = 320 * dpr;
-      ctx.scale(dpr, dpr);
-      const w = rect.width, h = 320, pad = 16;
-      const min = Math.min(...data), max = Math.max(...data), range = max - min || 1;
+      const w = rect.width, h = 320;
+      const padL = 58, padR = 12, padT = 28, padB = 36;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      var extras = [analysis.high, analysis.low];
+      if (analysis.ma7v != null) extras.push(analysis.ma7v);
+      if (analysis.ma20v != null) extras.push(analysis.ma20v);
+      const min = Math.min.apply(null, data.concat(extras));
+      const max = Math.max.apply(null, data.concat(extras));
+      const range = max - min || 1;
+
       ctx.clearRect(0, 0, w, h);
-      ctx.strokeStyle = getComputedStyle(html).getPropertyValue('--border').trim() || '#1e2a40';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 5; i++) {
-        const y = pad + (i / 4) * (h - pad * 2);
-        ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w - pad, y); ctx.stroke();
+      const isUp = analysis.trend !== 'bearish';
+      const color = analysis.trend === 'bearish' ? '#ef4444' : (analysis.trend === 'bullish' ? '#10b981' : '#3b82f6');
+      const border = getComputedStyle(html).getPropertyValue('--border').trim() || '#1e2a40';
+      const muted = getComputedStyle(html).getPropertyValue('--text-muted').trim() || '#94a3b8';
+      const textCol = getComputedStyle(html).getPropertyValue('--text').trim() || '#e2e8f0';
+
+      function yOf(v) { return padT + (1 - (v - min) / range) * (h - padT - padB); }
+      function xOf(i) { return padL + (i / (data.length - 1)) * (w - padL - padR); }
+      function fmt(v) {
+        return (window.MarketAPI && MarketAPI.formatToman)
+          ? MarketAPI.formatToman(v) : Math.round(v).toLocaleString('fa-IR');
       }
-      const isUp = data[data.length-1] >= data[0];
-      const color = isUp ? '#10b981' : '#ef4444';
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, color + '35'); grad.addColorStop(1, color + '00');
+
+      // grid + labels
+      ctx.font = '11px Vazirmatn, sans-serif';
+      ctx.strokeStyle = border;
+      ctx.fillStyle = muted;
+      ctx.lineWidth = 1;
+      for (var i = 0; i < 5; i++) {
+        var val = max - (i / 4) * range;
+        var y = yOf(val);
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
+        ctx.textAlign = 'right';
+        ctx.fillText(fmt(val), padL - 6, y + 4);
+      }
+
+      // High / Low lines
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#10b98188';
+      ctx.beginPath(); ctx.moveTo(padL, yOf(analysis.high)); ctx.lineTo(w - padR, yOf(analysis.high)); ctx.stroke();
+      ctx.strokeStyle = '#ef444488';
+      ctx.beginPath(); ctx.moveTo(padL, yOf(analysis.low)); ctx.lineTo(w - padR, yOf(analysis.low)); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // MA20
       ctx.beginPath();
-      data.forEach((v, i) => {
-        const x = pad + (i / (data.length - 1)) * (w - pad * 2);
-        const y = h - pad - ((v - min) / range) * (h - pad * 2);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      });
-      ctx.lineTo(w - pad, h - pad); ctx.lineTo(pad, h - pad); ctx.closePath();
-      ctx.fillStyle = grad; ctx.fill();
+      var started = false;
+      for (var i = 0; i < analysis.ma20.length; i++) {
+        var v = analysis.ma20[i];
+        if (v == null) continue;
+        var x = xOf(i), y = yOf(v);
+        if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // MA7
       ctx.beginPath();
-      data.forEach((v, i) => {
-        const x = pad + (i / (data.length - 1)) * (w - pad * 2);
-        const y = h - pad - ((v - min) / range) * (h - pad * 2);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      });
-      ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();
-      const lastX = pad + w - pad * 2;
-      const lastY = h - pad - ((data[data.length-1] - min) / range) * (h - pad * 2);
-      ctx.beginPath(); ctx.arc(lastX, lastY, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+      started = false;
+      for (var i = 0; i < analysis.ma7.length; i++) {
+        var v = analysis.ma7[i];
+        if (v == null) continue;
+        var x = xOf(i), y = yOf(v);
+        if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Price area + line
+      var pts = data.map(function (v, i) { return { x: xOf(i), y: yOf(v) }; });
+      var grad = ctx.createLinearGradient(0, padT, 0, h - padB);
+      grad.addColorStop(0, color + '40');
+      grad.addColorStop(1, color + '00');
+      ctx.beginPath();
+      pts.forEach(function (p, i) { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+      ctx.lineTo(pts[pts.length - 1].x, h - padB);
+      ctx.lineTo(pts[0].x, h - padB);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.beginPath();
+      pts.forEach(function (p, i) { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // last point
+      var last = pts[pts.length - 1];
+      ctx.beginPath();
+      ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      // Legend
+      ctx.font = '11px Vazirmatn, sans-serif';
+      ctx.textAlign = 'left';
+      var lx = padL + 4, ly = 14;
+      function legend(col, label) {
+        ctx.fillStyle = col;
+        ctx.fillRect(lx, ly - 7, 12, 3);
+        ctx.fillStyle = muted;
+        ctx.fillText(label, lx + 16, ly);
+        lx += ctx.measureText(label).width + 32;
+      }
+      legend(color, 'قیمت');
+      legend('#8b5cf6', 'MA7');
+      legend('#f59e0b', 'MA20');
+      legend('#10b98188', 'High');
+      legend('#ef444488', 'Low');
+
+      // TA summary strip under chart
+      var box = document.getElementById('ta-summary');
+      if (box) {
+        var trendFa = analysis.trend === 'bullish' ? 'صعودی' : (analysis.trend === 'bearish' ? 'نزولی' : 'خنثی');
+        var trendEn = analysis.trend === 'bullish' ? 'Bullish' : (analysis.trend === 'bearish' ? 'Bearish' : 'Neutral');
+        var cls = analysis.trend === 'bullish' ? 'up' : (analysis.trend === 'bearish' ? 'down' : '');
+        box.innerHTML =
+          '<span class="' + cls + '"><strong class="lang-fa">روند: ' + trendFa + '</strong><strong class="lang-en">Trend: ' + trendEn + '</strong></span>' +
+          '<span>Change: ' + (analysis.changePct >= 0 ? '+' : '') + analysis.changePct.toFixed(2) + '%</span>' +
+          '<span>MA7: ' + (analysis.ma7v != null ? fmt(analysis.ma7v) : '—') + '</span>' +
+          '<span>MA20: ' + (analysis.ma20v != null ? fmt(analysis.ma20v) : '—') + '</span>' +
+          '<span>High: ' + fmt(analysis.high) + '</span>' +
+          '<span>Low: ' + fmt(analysis.low) + '</span>';
+      }
     }
-
-    document.querySelectorAll('#main-range-tabs .range-tab').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('#main-range-tabs .range-tab').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        drawMainChart(mainRanges[btn.dataset.range]);
-      });
-    });
-
-    // ===== Search System (Mock Data) =====
-    const ASSETS = [
-      { id: 'gold18', nameFa: 'طلای ۱۸ عیار', nameEn: '18K Gold', symbol: 'XAU18', category: 'gold', icon: '🥇', price: '۴,۱۲۵,۰۰۰', change: '+۱.۲۴٪', up: true, view: 'asset' },
-      { id: 'gold24', nameFa: 'طلای ۲۴ عیار', nameEn: '24K Gold', symbol: 'XAU24', category: 'gold', icon: '🥇', price: '۵,۵۰۰,۰۰۰', change: '+۱.۲۴٪', up: true, view: 'asset' },
-      { id: 'emami', nameFa: 'سکه امامی', nameEn: 'Emami Coin', symbol: 'EMAMI', category: 'gold', icon: '🪙', price: '۴۸,۲۵۰,۰۰۰', change: '+۰.۹۸٪', up: true, view: 'asset' },
-      { id: 'bahar', nameFa: 'سکه بهار آزادی', nameEn: 'Bahar Azadi Coin', symbol: 'BAHAR', category: 'gold', icon: '🪙', price: '۴۵,۱۰۰,۰۰۰', change: '+۰.۸۵٪', up: true, view: 'asset' },
-      { id: 'half', nameFa: 'نیم‌سکه', nameEn: 'Half Coin', symbol: 'HALF', category: 'gold', icon: '🪙', price: '۲۶,۸۰۰,۰۰۰', change: '+۰.۷۲٪', up: true, view: 'asset' },
-      { id: 'silver', nameFa: 'نقره', nameEn: 'Silver', symbol: 'XAG', category: 'gold', icon: '🥈', price: '۴۸,۹۰۰', change: '−۰.۸۵٪', up: false, view: 'asset' },
-      { id: 'usd', nameFa: 'دلار آمریکا', nameEn: 'US Dollar', symbol: 'USD', category: 'forex', icon: '💵', price: '۶۸,۴۵۰', change: '−۰.۳۸٪', up: false, view: 'home' },
-      { id: 'eur', nameFa: 'یورو', nameEn: 'Euro', symbol: 'EUR', category: 'forex', icon: '💶', price: '۷۴,۱۲۰', change: '+۰.۶۲٪', up: true, view: 'home' },
-      { id: 'gbp', nameFa: 'پوند انگلیس', nameEn: 'British Pound', symbol: 'GBP', category: 'forex', icon: '💷', price: '۸۷,۴۰۰', change: '+۰.۴۱٪', up: true, view: 'home' },
-      { id: 'aed', nameFa: 'درهم امارات', nameEn: 'UAE Dirham', symbol: 'AED', category: 'forex', icon: '💴', price: '۱۸,۶۶۰', change: '−۰.۲۹٪', up: false, view: 'home' },
-      { id: 'try', nameFa: 'لیر ترکیه', nameEn: 'Turkish Lira', symbol: 'TRY', category: 'forex', icon: '₺', price: '—', change: '—', up: true, view: 'home' },
-      { id: 'sar', nameFa: 'ریال سعودی', nameEn: 'Saudi Riyal', symbol: 'SAR', category: 'forex', icon: '﷼', price: '—', change: '—', up: true, view: 'home' },
-      { id: 'cad', nameFa: 'دلار کانادا', nameEn: 'Canadian Dollar', symbol: 'CAD', category: 'forex', icon: 'C$', price: '—', change: '—', up: true, view: 'home' },
-      { id: 'aud', nameFa: 'دلار استرالیا', nameEn: 'Australian Dollar', symbol: 'AUD', category: 'forex', icon: 'A$', price: '—', change: '—', up: true, view: 'home' },
-      { id: 'cny', nameFa: 'یوان چین', nameEn: 'Chinese Yuan', symbol: 'CNY', category: 'forex', icon: '¥', price: '—', change: '—', up: true, view: 'home' },
-      { id: 'mesghal', nameFa: 'مثقال طلا', nameEn: 'Mesghal Gold', symbol: 'MESGHAL', category: 'gold', icon: '🥇', price: '—', change: '—', up: true, view: 'asset' },
-      { id: 'btc', nameFa: 'بیت‌کوین', nameEn: 'Bitcoin', symbol: 'BTC', category: 'crypto', icon: '₿', price: 'داده موجود نیست', change: '+۲.۱۵٪', up: true, view: 'home' },
-      { id: 'eth', nameFa: 'اتریوم', nameEn: 'Ethereum', symbol: 'ETH', category: 'crypto', icon: 'Ξ', price: 'داده موجود نیست', change: '+۱.۸۷٪', up: true, view: 'home' },
-      { id: 'sol', nameFa: 'سولانا', nameEn: 'Solana', symbol: 'SOL', category: 'crypto', icon: '◎', price: 'داده موجود نیست', change: '−۰.۹۲٪', up: false, view: 'home' },
-      { id: 'xrp', nameFa: 'ریپل', nameEn: 'Ripple', symbol: 'XRP', category: 'crypto', icon: '✕', price: 'داده موجود نیست', change: '+۳.۴۲٪', up: true, view: 'home' },
-      { id: 'usdt', nameFa: 'تتر', nameEn: 'Tether', symbol: 'USDT', category: 'crypto', icon: '🟡', price: '۱.۰۰۰', change: '۰.۰۰٪', up: true, view: 'home' },
-      { id: 'tedpix', nameFa: 'شاخص کل بورس', nameEn: 'TEDPIX Index', symbol: 'TEDPIX', category: 'stock', icon: '📈', price: 'داده موجود نیست', change: '+۰.۹۱٪', up: true, view: 'home' },
-      { id: 'foolad', nameFa: 'فولاد', nameEn: 'Foolad', symbol: 'FOLD', category: 'stock', icon: '🏭', price: 'داده موجود نیست', change: '−۱.۰۴٪', up: false, view: 'home' },
-      { id: 'shapna', nameFa: 'شپنا', nameEn: 'Shapna', symbol: 'PNES', category: 'stock', icon: '⛽', price: 'داده موجود نیست', change: '+۱.۳۶٪', up: true, view: 'home' },
-      { id: 'brent', nameFa: 'نفت برنت', nameEn: 'Brent Crude', symbol: 'BRENT', category: 'commodities', icon: '🛢', price: 'داده موجود نیست', change: '+۰.۷۸٪', up: true, view: 'home' },
-      { id: 'wheat', nameFa: 'گندم', nameEn: 'Wheat', symbol: 'WHEAT', category: 'commodities', icon: '🌾', price: 'داده موجود نیست', change: '−۱.۲٪', up: false, view: 'home' },
-      { id: 'copper', nameFa: 'مس', nameEn: 'Copper', symbol: 'COPPER', category: 'commodities', icon: '⛏', price: 'داده موجود نیست', change: '+۰.۴۵٪', up: true, view: 'home' }
-    ];
-
-    const CAT_LABELS = {
-      gold: { fa: 'فلزات', en: 'Metals' },
-      forex: { fa: 'ارز', en: 'Forex' },
-      stock: { fa: 'بورس', en: 'Stock' },
-      crypto: { fa: 'کریپتو', en: 'Crypto' },
-      commodities: { fa: 'کالاها', en: 'Commodities' }
-    };
-
-    let currentSearchQuery = '';
-    let currentFilter = 'all';
-    let activeSuggestionIndex = -1;
 
     function normalize(str) {
       return (str || '').toString().toLowerCase().trim()
@@ -2194,6 +2297,54 @@
      * Apply live snapshot to visible price cards & tools PRICES
      * @param {{ items: Record<string, object>, updatedAt: string }} snap
      */
+
+    function updateMarketStatus(items) {
+      if (!items) return;
+      document.querySelectorAll('.status-card').forEach(function (card) {
+        var label = ((card.querySelector('.status-label') || {}).textContent || '');
+        var item = null;
+        var isStock = false;
+        if (label.indexOf('فلز') !== -1 || label.indexOf('Metal') !== -1)
+          item = items.gold18;
+        else if (label.indexOf('ارز') !== -1 || label.indexOf('Forex') !== -1)
+          item = items.usd;
+        else if (label.indexOf('رمزارز') !== -1 || label.indexOf('Crypto') !== -1)
+          item = items.btc;
+        else if (label.indexOf('بورس') !== -1 || label.indexOf('Stock') !== -1)
+          isStock = true;
+
+        var valEl = card.querySelector('.status-value');
+        var metaEl = card.querySelector('.status-meta');
+        var bar = card.querySelector('.status-bar-fill');
+
+        if (isStock) {
+          if (valEl) valEl.textContent = 'داده موجود نیست';
+          if (metaEl) { metaEl.textContent = '—'; metaEl.className = 'status-meta'; }
+          if (bar) { bar.style.width = '0%'; bar.className = 'status-bar-fill'; }
+          return;
+        }
+        if (!item || item.changePercent == null) {
+          if (valEl) valEl.textContent = 'داده موجود نیست';
+          return;
+        }
+        var pct = item.changePercent;
+        var trendFa = pct > 0.5 ? 'صعودی' : (pct < -0.5 ? 'نزولی' : 'نوسانی');
+        var trendEn = pct > 0.5 ? 'Bullish' : (pct < -0.5 ? 'Bearish' : 'Volatile');
+        if (valEl) {
+          valEl.innerHTML = '<span class="lang-fa">' + trendFa + '</span><span class="lang-en">' + trendEn + '</span>';
+        }
+        if (metaEl) {
+          metaEl.className = 'status-meta ' + (item.isUp ? 'up' : 'down');
+          metaEl.innerHTML = '<span>' + (item.isUp ? '▲ ' : '▼ ') + (item.changeFormatted || '') + '</span>';
+        }
+        if (bar) {
+          var w = Math.min(100, Math.max(8, Math.abs(pct) * 25));
+          bar.style.width = w + '%';
+          bar.className = 'status-bar-fill ' + (item.isUp ? 'up' : 'down');
+        }
+      });
+    }
+
     function applyLivePrices(snap) {
       if (!snap || !snap.items) return;
       const { items } = snap;
@@ -2222,6 +2373,9 @@
         else if (name.includes('بهار') || name.includes('Bahar')) item = items.bahar;
         else if (name.includes('نیم') || name.includes('Half')) item = items.half;
         else if (name.includes('تتر') || name.includes('Tether')) item = items.usdt;
+        else if (name.includes('بیت') || name.includes('Bitcoin') || name.includes('BTC')) item = items.btc;
+        else if (name.includes('اتریوم') || name.includes('Ethereum') || name.includes('ETH')) item = items.eth;
+        else if (name.includes('سولانا') || name.includes('Solana')) item = items.sol;
         else if (name.includes('لیر') || name.includes('TRY')) item = items['try'];
         else if (name.includes('سعودی') || name.includes('SAR')) item = items.sar;
         else if (name.includes('کانادا') || name.includes('CAD')) item = items.cad;
@@ -2341,23 +2495,19 @@
         }).join('');
       }
 
-      // Mark non-live homepage cards (stock / crypto samples)
+      // Only mark stock index as unavailable (no live API)
       document.querySelectorAll('.price-card').forEach(function (card) {
         var nameEl = card.querySelector('.asset-name');
         if (!nameEl) return;
         var n = nameEl.textContent || '';
-        if (n.indexOf('بورس') !== -1 || n.indexOf('TEDPIX') !== -1 ||
-            n.indexOf('بیت') !== -1 || n.indexOf('Bitcoin') !== -1 ||
-            n.indexOf('اتریوم') !== -1 || n.indexOf('Ethereum') !== -1) {
+        if (n.indexOf('بورس') !== -1 || n.indexOf('TEDPIX') !== -1) {
           var pv = card.querySelector('.price-value');
-          if (pv && !nameEl.querySelector('.data-na')) {
-            // keep NA badge if present; replace mock price
-            if (pv.textContent.indexOf('داده') === -1) {
-              pv.textContent = 'داده موجود نیست';
-            }
-          }
+          if (pv) pv.textContent = 'داده موجود نیست';
         }
       });
+
+      // Market status cards from live data
+      updateMarketStatus(items);
     }
 
     async function refreshLivePrices(force = false) {
