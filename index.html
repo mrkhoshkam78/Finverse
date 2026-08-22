@@ -704,6 +704,269 @@
     @media (max-width: 480px) {
       .panel-stats { grid-template-columns: 1fr; }
     }
+
+    /* HOME REDESIGN V2 — scoped to #view-home only */
+    #view-home {
+      --home-accent: var(--primary);
+      --home-glow: color-mix(in srgb, var(--primary) 18%, transparent);
+    }
+    #view-home .hero {
+      position: relative;
+      padding: 64px 0 48px;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background:
+        radial-gradient(900px 420px at 85% -10%, var(--home-glow), transparent 60%),
+        radial-gradient(700px 360px at 10% 110%, color-mix(in srgb, #8b5cf6 12%, transparent), transparent 55%),
+        linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%);
+    }
+    #view-home .hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.25;
+      mask-image: linear-gradient(180deg, #000 20%, transparent 95%);
+      pointer-events: none;
+    }
+    #view-home .hero-content {
+      position: relative;
+      text-align: start;
+      max-width: 720px;
+      margin: 0;
+    }
+    #view-home .hero-kicker {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px; border-radius: 999px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg-card) 80%, transparent);
+      color: var(--text-secondary); font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.02em; margin-bottom: 18px;
+    }
+    #view-home .hero-kicker i {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--up);
+      box-shadow: 0 0 0 4px var(--up-bg); display: inline-block;
+    }
+    #view-home .hero h1 {
+      font-size: clamp(1.9rem, 4.4vw, 2.85rem);
+      font-weight: 800; line-height: 1.2; margin-bottom: 14px;
+      letter-spacing: -0.03em;
+      background: none;
+      -webkit-text-fill-color: unset;
+      color: var(--text);
+    }
+    #view-home .hero h1 span.grad {
+      background: linear-gradient(120deg, var(--primary), #8b5cf6 55%, #06b6d4);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    #view-home .hero p {
+      color: var(--text-secondary); font-size: 1.05rem;
+      max-width: 540px; margin-bottom: 26px; line-height: 1.75;
+    }
+    #view-home .hero-search-wrap { max-width: 560px; margin: 0; }
+    #view-home .hero-search {
+      background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+      backdrop-filter: blur(10px);
+    }
+    #view-home .hero-search input { padding: 14px 16px; font-size: 0.98rem; }
+    #view-home .hero-search button {
+      border-radius: 12px; padding: 12px 22px;
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      box-shadow: 0 6px 18px color-mix(in srgb, var(--primary) 35%, transparent);
+    }
+    #view-home .hero-search button:hover { filter: brightness(1.06); }
+
+    #view-home .home-section {
+      padding: 40px 0;
+    }
+    #view-home .home-section.alt {
+      background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--bg-elevated) 70%, transparent) 30%, transparent);
+    }
+    #view-home .section-head {
+      display: flex; flex-wrap: wrap; align-items: flex-end;
+      justify-content: space-between; gap: 12px 20px;
+      margin-bottom: 22px;
+    }
+    #view-home .section-head .eyebrow {
+      font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--primary); margin-bottom: 6px;
+    }
+    #view-home .section-title {
+      font-size: 1.35rem; margin-bottom: 0; font-weight: 800; letter-spacing: -0.02em;
+    }
+    #view-home .section-subtitle {
+      margin: 0; color: var(--text-muted); font-size: 0.9rem;
+    }
+
+    #view-home .datetime-bar {
+      justify-content: flex-start;
+      gap: 10px 14px;
+      padding: 10px 14px;
+      margin-bottom: 28px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--bg-card) 85%, transparent);
+      border: 1px solid var(--border);
+      box-shadow: none;
+      font-size: 0.84rem;
+    }
+    #view-home .datetime-bar .dt-item {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--bg-hover);
+    }
+    #view-home .datetime-bar strong { font-variant-numeric: tabular-nums; }
+
+    #view-home .status-grid { gap: 14px; }
+    #view-home .status-card {
+      position: relative;
+      padding: 18px 18px 16px;
+      border-radius: 16px;
+      background: linear-gradient(160deg, var(--bg-card), color-mix(in srgb, var(--bg-elevated) 80%, var(--bg-card)));
+      overflow: hidden;
+    }
+    #view-home .status-card::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--primary), transparent);
+      opacity: 0.85;
+    }
+    #view-home .status-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+    }
+    #view-home .status-value { font-size: 1.2rem; letter-spacing: -0.02em; }
+    #view-home .status-bar { height: 3px; border-radius: 999px; }
+    #view-home .status-icon { border-radius: 12px; }
+
+    #view-home .market-grid { gap: 14px; }
+    #view-home .price-card {
+      padding: 18px;
+      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+    #view-home .price-card:hover {
+      border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+    }
+    #view-home .price-card::after {
+      content: "";
+      position: absolute; inset-inline-start: 0; top: 16px; bottom: 16px;
+      width: 3px; border-radius: 999px;
+      background: linear-gradient(180deg, var(--primary), transparent);
+      opacity: 0.55;
+    }
+    #view-home .price-value {
+      font-size: 1.45rem;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.03em;
+      margin-top: 4px;
+    }
+    #view-home .asset-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, var(--bg-hover), var(--bg-elevated));
+      border: 1px solid var(--border);
+    }
+    #view-home .card-footer {
+      margin-top: 12px; padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+    #view-home .update-info {
+      display: inline-flex;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    #view-home .gl-grid { gap: 16px; }
+    #view-home .gl-card {
+      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+    #view-home .gl-header {
+      padding: 14px 18px;
+      background: color-mix(in srgb, var(--bg-elevated) 80%, transparent);
+      font-size: 0.92rem;
+    }
+    #view-home .gl-item { padding: 12px 18px; }
+    #view-home .gl-change { font-variant-numeric: tabular-nums; }
+
+    #view-home .changes-list {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    #view-home .change-item {
+      padding: 14px 18px;
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    }
+    #view-home .change-time {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: var(--text-secondary);
+      min-width: 56px;
+    }
+
+    #view-home .tools-grid { gap: 16px; }
+    #view-home .tool-card {
+      border-radius: 16px;
+      padding: 22px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 100%, transparent), var(--bg-card)),
+        var(--bg-card);
+      border: 1px solid var(--border);
+    }
+    #view-home .tool-card h3 {
+      font-size: 1rem;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    #view-home .tool-btn {
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+    }
+    #view-home .tool-result {
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--bg-hover) 90%, transparent);
+    }
+
+    #view-home .market-summary-box {
+      border-radius: 18px;
+      padding: 24px 26px;
+      border: 1px solid var(--border);
+      background:
+        radial-gradient(500px 180px at 100% 0%, var(--home-glow), transparent 60%),
+        var(--bg-card);
+      margin-bottom: 28px;
+    }
+    #view-home .market-summary-box h2 {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+      #view-home .hero { padding: 40px 0 28px; }
+      #view-home .hero-content { text-align: center; }
+      #view-home .hero p { margin-left: auto; margin-right: auto; }
+      #view-home .hero-search-wrap { margin: 0 auto; }
+      #view-home .datetime-bar { border-radius: 16px; justify-content: center; }
+      #view-home .price-card::after { display: none; }
+    }
+
   </style>
 </head>
 <body>
@@ -789,9 +1052,16 @@
     <section class="hero">
       <div class="container">
         <div class="hero-content">
-          <h1><span class="lang-fa">قیمت لحظه‌ای بازارهای مالی</span><span class="lang-en">Real-time Financial Market Prices</span></h1>
-          <p><span class="lang-fa">دسترسی سریع به قیمت طلا، نقره، ارز، بورس و رمزارزها</span><span class="lang-en">Quick access to gold, silver, forex, stocks and crypto prices</span></p>
-          <div class="hero-search-wrap" style="position:relative;max-width:480px;margin:0 auto">
+          <div class="hero-kicker"><i aria-hidden="true"></i>
+            <span class="lang-fa">بازار زنده · TGJU</span>
+            <span class="lang-en">Live markets · TGJU</span>
+          </div>
+          <h1>
+            <span class="lang-fa">قیمت لحظه‌ای <span class="grad">بازارهای مالی</span></span>
+            <span class="lang-en">Real-time <span class="grad">Financial Markets</span></span>
+          </h1>
+          <p><span class="lang-fa">دسترسی سریع به قیمت طلا، نقره، ارز، بورس و رمزارزها با رابط حرفه‌ای فاینورس</span><span class="lang-en">Quick access to gold, silver, forex, stocks and crypto with Finverse’s professional interface</span></p>
+          <div class="hero-search-wrap" style="position:relative;max-width:560px">
             <div class="hero-search">
               <input type="search" id="hero-search-input" autocomplete="off" placeholder="جستجوی سریع: طلا، دلار، بیت‌کوین..." aria-autocomplete="list" aria-controls="search-dropdown">
               <button type="button" id="hero-search-btn"><span class="lang-fa">جستجو</span><span class="lang-en">Search</span></button>
@@ -802,7 +1072,7 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section home-section">
       <div class="container">
         <div class="datetime-bar" id="datetime-bar" aria-live="polite">
           <div class="dt-item">
@@ -852,10 +1122,15 @@
       </div>
     </section>
 
-    <section class="section" style="background:var(--bg-elevated)">
+    <section class="section home-section" style="background:var(--bg-elevated)">
       <div class="container">
-        <h2 class="section-title"><span class="lang-fa">قیمت‌های مهم روز</span><span class="lang-en">Key Prices</span></h2>
-        <p class="section-subtitle"><span class="lang-fa">روی کارت‌ها کلیک کنید</span><span class="lang-en">Click cards for details</span></p>
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Watchlist</div>
+            <h2 class="section-title"><span class="lang-fa">قیمت‌های مهم روز</span><span class="lang-en">Key Prices</span></h2>
+          </div>
+          <p class="section-subtitle"><span class="lang-fa">روی کارت‌ها کلیک کنید</span><span class="lang-en">Click cards for details</span></p>
+        </div>
         <div class="update-info" style="margin-bottom:20px"><span class="dot"></span>
           <span class="lang-fa">آخرین به‌روزرسانی: ۱۵:۳۰ | منبع نمونه</span>
           <span class="lang-en">Last update: 15:30 | Sample source</span>
@@ -919,9 +1194,14 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section home-section">
       <div class="container">
-        <h2 class="section-title"><span class="lang-fa">بیشترین رشد و افت</span><span class="lang-en">Top Gainers & Losers</span></h2>
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Movers</div>
+            <h2 class="section-title"><span class="lang-fa">بیشترین رشد و افت</span><span class="lang-en">Top Gainers & Losers</span></h2>
+          </div>
+        </div>
         <div class="gl-grid">
           <div class="gl-card">
             <div class="gl-header gainers"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg> <span class="lang-fa">بیشترین رشد</span><span class="lang-en">Top Gainers</span></div>
@@ -943,9 +1223,14 @@
       </div>
     </section>
 
-    <section class="section" style="background:var(--bg-elevated)">
+    <section class="section home-section" style="background:var(--bg-elevated)">
       <div class="container">
-        <h2 class="section-title"><span class="lang-fa">آخرین تغییرات</span><span class="lang-en">Latest Changes</span></h2>
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Activity</div>
+            <h2 class="section-title"><span class="lang-fa">آخرین تغییرات</span><span class="lang-en">Latest Changes</span></h2>
+          </div>
+        </div>
         <div class="changes-list">
           <div class="change-item"><span class="change-time">۱۵:۲۸</span><div class="change-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></span> <span class="lang-fa">طلای ۱۸</span><span class="lang-en">18K Gold</span></div><span class="change-desc"><span class="lang-fa">عبور از سطح ۴,۱۲۰,۰۰۰</span><span class="lang-en">Crossed 4,120,000 level</span></span><span class="change-value up">+۱.۲۴٪</span></div>
           <div class="change-item"><span class="change-time">۱۵:۲۲</span><div class="change-asset"><span class="icon"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 8h5a2.5 2.5 0 0 1 0 5H9zm0 5h5.5a2.5 2.5 0 0 1 0 5H9zM10 6v2M13 6v2M10 16v2M13 16v2"/></svg></span> BTC</div><span class="change-desc"><span class="lang-fa">افزایش حجم معاملات</span><span class="lang-en">Volume increase</span></span><span class="change-value up">+۲.۱۵٪</span></div>
@@ -954,9 +1239,14 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section home-section">
       <div class="container">
-        <h2 class="section-title"><span class="lang-fa">ابزارهای سریع</span><span class="lang-en">Quick Tools</span></h2>
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Tools</div>
+            <h2 class="section-title"><span class="lang-fa">ابزارهای سریع</span><span class="lang-en">Quick Tools</span></h2>
+          </div>
+        </div>
         <div class="tools-grid">
           <div class="tool-card">
             <h3><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg> <span class="lang-fa">محاسبه طلا</span><span class="lang-en">Gold Calculator</span></h3>
