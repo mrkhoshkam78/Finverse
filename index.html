@@ -325,10 +325,7 @@
     .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap; gap: 12px; }
 
     /* Mobile Nav */
-    .mobile-nav { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; padding: 24px; flex-direction: column; gap: 8px; transform: translateX(100%); transition: transform 0.3s ease; }
-    .mobile-nav.open { display: flex; transform: translateX(0); }
-    .mobile-nav a { padding: 14px 16px; border-radius: var(--radius); font-weight: 500; color: var(--text); background: var(--bg-card); border: 1px solid var(--border); }
-    .mobile-nav-close { align-self: flex-start; margin-bottom: 16px; }
+    /* mobile-nav styles: see modern drawer block below */
 
     /* i18n */
     [data-lang="fa"] .lang-en { display: none !important; }
@@ -521,7 +518,7 @@
     .ta-summary .down { color: var(--down); }
 
     /* Modern nav + mobile drawer */
-    .nav { display: flex; align-items: center; gap: 2px; }
+    .nav { align-items: center; gap: 2px; }
     .nav a {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 8px 14px; border-radius: 999px; font-size: 0.875rem; font-weight: 600;
@@ -536,7 +533,7 @@
     .nav a:active { transform: scale(0.97); }
 
     .mobile-nav {
-      display: flex; position: fixed; inset: 0; z-index: 200;
+      display: flex !important; position: fixed; inset: 0; z-index: 200;
       background: color-mix(in srgb, var(--bg) 88%, transparent);
       backdrop-filter: blur(10px);
       opacity: 0; visibility: hidden; pointer-events: none;
@@ -586,7 +583,12 @@
       background: transparent; border: none; cursor: pointer;
     }
     .user-menu-dropdown button:hover { background: var(--bg-hover); }
-    .user-email { color: var(--text-muted); font-size: 0.8rem; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+    .user-email { color: var(--text-muted); font-size: 0.8rem; padding: 10px 12px; }
+    .user-panel-label {
+      padding: 10px 12px; margin-bottom: 4px; border-bottom: 1px solid var(--border);
+      font-size: 0.9rem; color: var(--text); font-weight: 600;
+    }
+    .user-panel-label strong { color: var(--primary); font-weight: 800; }
 
     /* auth-modal */
     .auth-overlay {
@@ -674,6 +676,10 @@
           </button>
           <div class="user-menu-dropdown" id="user-menu-dropdown" role="menu">
             <div class="user-email" id="user-menu-email" hidden>—</div>
+            <div class="user-panel-label" id="user-panel-label" hidden>
+              <span class="lang-fa">پنل</span><span class="lang-en">Panel</span>:
+              <strong id="user-display-name">—</strong>
+            </div>
             <button type="button" id="btn-open-login" role="menuitem"><span class="lang-fa">ورود</span><span class="lang-en">Login</span></button>
             <button type="button" id="btn-open-register" role="menuitem"><span class="lang-fa">ثبت‌نام</span><span class="lang-en">Register</span></button>
             <button type="button" id="btn-logout" role="menuitem" hidden><span class="lang-fa">خروج</span><span class="lang-en">Logout</span></button>
@@ -2880,28 +2886,44 @@
 
       function renderAuth(state) {
         var emailEl = document.getElementById('user-menu-email');
+        var panelLabel = document.getElementById('user-panel-label');
+        var displayNameEl = document.getElementById('user-display-name');
         var btnLogin = document.getElementById('btn-open-login');
         var btnReg = document.getElementById('btn-open-register');
         var btnOut = document.getElementById('btn-logout');
+        var displayName = (state.profile && state.profile.display_name) ||
+          (state.user && state.user.user_metadata && state.user.user_metadata.display_name) ||
+          (state.user && state.user.email ? state.user.email.split('@')[0] : 'User');
         if (state.user) {
           emailEl.hidden = false;
-          emailEl.textContent = state.user.email || (state.profile && state.profile.display_name) || 'User';
+          emailEl.textContent = state.user.email || '';
+          if (panelLabel) panelLabel.hidden = false;
+          if (displayNameEl) displayNameEl.textContent = displayName;
           btnLogin.hidden = true;
           btnReg.hidden = true;
           btnOut.hidden = false;
           if (mobAuth) {
-            mobAuth.querySelector('.lang-fa').textContent = 'خروج';
-            mobAuth.querySelector('.lang-en').textContent = 'Logout';
-            mobAuth.onclick = function (e) { e.preventDefault(); FinverseAuth.signOut(); closeMobileNav(); };
+            var fa = mobAuth.querySelector('.lang-fa');
+            var en = mobAuth.querySelector('.lang-en');
+            if (fa) fa.textContent = 'پنل: ' + displayName;
+            if (en) en.textContent = 'Panel: ' + displayName;
+            mobAuth.onclick = function (e) {
+              e.preventDefault();
+              closeMobileNav();
+              userMenu.classList.add('open');
+            };
           }
         } else {
           emailEl.hidden = true;
+          if (panelLabel) panelLabel.hidden = true;
           btnLogin.hidden = false;
           btnReg.hidden = false;
           btnOut.hidden = true;
           if (mobAuth) {
-            mobAuth.querySelector('.lang-fa').textContent = 'حساب کاربری';
-            mobAuth.querySelector('.lang-en').textContent = 'Account';
+            var fa2 = mobAuth.querySelector('.lang-fa');
+            var en2 = mobAuth.querySelector('.lang-en');
+            if (fa2) fa2.textContent = 'حساب کاربری';
+            if (en2) en2.textContent = 'Account';
             mobAuth.onclick = function (e) { e.preventDefault(); closeMobileNav(); openAuth('login'); };
           }
         }
@@ -2910,7 +2932,37 @@
       if (window.FinverseAuth) {
         FinverseAuth.onAuthChange(renderAuth);
         FinverseAuth.init();
-      } else {
+      }
+
+    // Supabase email-link errors (otp_expired, access_denied)
+    (function handleAuthHash() {
+      var hash = window.location.hash || '';
+      if (!hash || hash.indexOf('error=') === -1) return;
+      var params = new URLSearchParams(hash.replace(/^#/, ''));
+      var code = params.get('error_code') || params.get('error') || '';
+      var desc = params.get('error_description') || '';
+      var msg = 'لینک تأیید ایمیل نامعتبر یا منقضی شده است. دوباره ثبت‌نام/ورود کنید یا لینک جدید درخواست کنید.';
+      if (/otp_expired/i.test(code) || /expired/i.test(desc)) {
+        msg = 'لینک تأیید ایمیل منقضی شده است. از پنل Supabase تأیید ایمیل را خاموش کنید یا لینک جدید بگیرید.';
+      }
+      console.warn('[Auth]', code, desc);
+      // clean URL
+      if (window.history && history.replaceState) {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+      setTimeout(function () {
+        var overlay = document.getElementById('auth-overlay');
+        var errEl = document.getElementById('auth-error');
+        if (overlay && errEl) {
+          overlay.classList.add('open');
+          errEl.textContent = msg;
+          errEl.classList.add('show');
+        } else {
+          alert(msg);
+        }
+      }, 400);
+    })();
+ else {
         console.warn('FinverseAuth missing');
       }
     })();

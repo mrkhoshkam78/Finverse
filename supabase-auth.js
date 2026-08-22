@@ -1,6 +1,5 @@
 /**
  * Finverse Auth — Supabase (Anon/Publishable key only)
- * Modular: ready for watchlist, preferences, premium later
  */
 (function (global) {
   'use strict';
@@ -31,6 +30,15 @@
     };
   }
 
+  function siteOrigin() {
+    try {
+      if (global.location && global.location.origin && global.location.origin !== 'null') {
+        return global.location.origin + (global.location.pathname || '/').replace(/index\.html$/i, '');
+      }
+    } catch (e) {}
+    return 'http://localhost:3000';
+  }
+
   function getClient() {
     if (client) return client;
     if (!global.supabase || !global.supabase.createClient) {
@@ -41,7 +49,8 @@
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        storage: global.localStorage
+        storage: global.localStorage,
+        flowType: 'pkce'
       }
     });
     return client;
@@ -51,11 +60,12 @@
     if (!err) return 'خطای ناشناخته';
     var msg = err.message || String(err);
     if (/invalid login credentials/i.test(msg)) return 'ایمیل یا رمز عبور نادرست است';
-    if (/email not confirmed/i.test(msg)) return 'ایمیل هنوز تأیید نشده است';
+    if (/email not confirmed/i.test(msg)) return 'ایمیل هنوز تأیید نشده است. لینک ایمیل را بررسی کنید یا تأیید ایمیل را در Supabase خاموش کنید.';
     if (/already registered|already exists/i.test(msg)) return 'این ایمیل قبلاً ثبت شده است';
     if (/password/i.test(msg) && /least/i.test(msg)) return 'رمز عبور باید حداقل ۶ کاراکتر باشد';
     if (/valid email/i.test(msg)) return 'فرمت ایمیل معتبر نیست';
     if (/network|fetch/i.test(msg)) return 'خطای شبکه — اتصال اینترنت را بررسی کنید';
+    if (/otp|expired|invalid/i.test(msg)) return 'لینک تأیید نامعتبر یا منقضی شده است';
     return msg;
   }
 
@@ -67,7 +77,6 @@
       state.profile = existing.data;
       return existing.data;
     }
-    // create profile row (RLS: user can insert own)
     var payload = {
       id: user.id,
       email: user.email,
@@ -120,19 +129,28 @@
     emit();
     try {
       var sb = getClient();
+      var redirectTo = siteOrigin();
       var res = await sb.auth.signUp({
         email: email,
         password: password,
         options: {
-          data: { display_name: displayName || email.split('@')[0] }
+          data: { display_name: displayName || email.split('@')[0] },
+          emailRedirectTo: redirectTo
         }
       });
       if (res.error) throw res.error;
       state.user = res.data.user;
-      if (state.user) await ensureProfile(state.user);
+      // If session exists (email confirm disabled), user is logged in
+      if (res.data.session && state.user) {
+        await ensureProfile(state.user);
+      }
       state.loading = false;
       emit();
-      return { ok: true, user: state.user, needsEmailConfirm: !!(res.data.user && !res.data.session) };
+      return {
+        ok: true,
+        user: state.user,
+        needsEmailConfirm: !!(res.data.user && !res.data.session)
+      };
     } catch (e) {
       state.loading = false;
       state.error = mapError(e);
